@@ -13,6 +13,9 @@
     join: function (o) {
       return rpc('cc_join_waitlist', { p_product: o.product, p_name: o.name || '', p_email: o.email, p_mobile: o.mobile || null, p_ref: o.ref || null, p_suggestion: o.suggestion || null });
     },
+    /* daily bars + split/bonus events for the stock chart: {d,o,h,l,c,v,ev} (prices in paise) */
+    bars: function (symbol) { return rpc('cc_stock_bars', { p_symbol: symbol }); },
+    health: function () { return rpc('cc_health_status', {}); },
     count: function (product) { return rpc('cc_waitlist_count', { p_product: product }); },
     /* {name, email, topic, message} */
     contact: function (o) {

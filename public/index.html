@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Capital Code — Nifty 500 Screener &amp; Investment Console</title>
+<title>The Capital Code — NSE Top-1000 Stock Screener &amp; Investment Console</title>
 <link rel="icon" type="image/svg+xml" href="./assets/tcc_icon.svg">
 <style>
 /* embedded fonts - latin subset */
@@ -166,6 +166,30 @@
   .foot-links{display:flex;gap:6px 18px;flex-wrap:wrap;margin:0 0 12px;font-size:12.5px}
   .foot-links a{color:var(--text-2);text-decoration:none;border-bottom:1px solid var(--line-2)}
   .foot-links a:hover{color:var(--accent)}
+  .cc-health{margin:0 0 10px}
+  .cc-pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 14px;font:600 12px var(--ui);line-height:1.35;text-align:left}
+  .cc-pill.bad{background:#d1344a;color:#fff;border:0;cursor:pointer;max-width:100%}
+  .cc-pill.bad u{opacity:.85;white-space:nowrap}
+  .cc-pill.ok{background:rgba(23,166,115,.12);color:#12805a;font-weight:500}
+  .cc-pill-detail{margin-top:8px;border:1px solid #d1344a;border-radius:12px;padding:10px 14px;font-size:12.5px;color:var(--text);background:rgba(209,52,74,.07)}
+  .cc-pill-detail ul{margin:0 0 6px;padding-left:18px}.cc-pill-detail p{margin:0;color:var(--text-2);font-size:11.5px}
+  .sc-cash-note{border:1px solid #D4606A;background:rgba(212,96,106,.10);color:var(--text);border-radius:12px;padding:12px 16px;margin-bottom:14px;font-size:13px;line-height:1.5}
+  /* stock chart inside the stock card */
+  .sc-modal.wide{max-width:920px}
+  .cc-chart{margin:2px 0 18px}
+  .cc-ch-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+  .cc-ch-seg{display:inline-flex;gap:2px;padding:3px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line)}
+  .cc-ch-seg button{border:0;background:transparent;color:var(--text-2);font:600 11.5px var(--ui);padding:5px 11px;border-radius:999px;cursor:pointer}
+  .cc-ch-seg button:hover{color:var(--text)}
+  .cc-ch-seg button.on{background:var(--accent);color:var(--logo-ink)}
+  .cc-ch-seg[data-g=ma] button{position:relative}
+  .cc-ch-seg[data-g=ma] button:not(.on){opacity:.5}
+  .cc-ch-leg{font:500 11.5px var(--mono);color:var(--text-2);min-height:18px;margin-bottom:4px}
+  .cc-ch-leg b{color:var(--text)}.cc-up{color:#17a673}.cc-dn{color:#e0475b}
+  .cc-ch-box{height:360px;position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .cc-ch-msg{position:absolute;inset:0;display:grid;place-items:center;color:var(--text-3);font-size:13px}
+  .cc-ch-note{font-size:11px;color:var(--text-3);line-height:1.5;margin-top:8px}
+  @media(max-width:640px){.cc-ch-box{height:300px}}
   /* page dust */
   .page-dust{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
   .page-dust i{position:absolute;bottom:-12px;border-radius:50%;background:var(--accent);opacity:0;box-shadow:0 0 8px var(--accent);
@@ -771,6 +795,8 @@ html[data-theme="dark"] .sc-streak-badge{background:rgba(232,196,106,0.16);color
 </style>
 <script src="/js/cc-api.js"></script>
 <script src="/js/sites.js"></script>
+<script src="/js/stock-chart.js"></script>
+<script src="/js/health.js"></script>
 </head>
 <body>
 
@@ -1257,7 +1283,7 @@ P({ id:"contact", type:"custom", group:"Overview", num:"", tab:"Contact Us",
     title:"Contact Us", lede:"Questions, tool feedback, or research topic suggestions." });
 
 P({ id:"screener", type:"custom", group:"Overview", num:"", tab:"Nifty 500 Screener",
-    title:"Nifty 500 Stage 2 Screener", lede:"Weekly Friday-updated Sector-First, 8-Rule Minervini &amp; 150-DMA Exit system." });
+    title:"NSE Top-1000 Stage 2 Screener", lede:"Weekly Friday-updated Sector-First, 8-Rule Minervini screener. A stock leaves the list the week any rule fails." });
 
 /* ---------- Dashboard ---------- */
 P({ id:"dash", type:"custom", group:"Overview", num:"", tab:"Calculators Hub",
@@ -2069,17 +2095,19 @@ function openStockModal(sym, d){
   const exitTag = s.dma150_exit_broken
     ? '<span class="sc-dn">EXIT: BROKE 150-DMA</span>'
     : (s.qualifies ? '<span class="sc-up">QUALIFIES (8/8 &amp; &gt;150-DMA)</span>' : '<span class="sc-dn">'+(s.exit_reason||'OUT OF 8/8')+'</span>');
-  wrap.innerHTML = '<div class="sc-modal">'
+  wrap.innerHTML = '<div class="sc-modal wide">'
     + '<div class="sc-modal-head"><div><div class="kicker">'+escapeHTML(s.sector)+' &middot; '+escapeHTML(d.market_date)+'</div>'
     + '<h2 class="page-title" style="margin:2px 0 4px">'+escapeHTML(s.symbol)+' <span style="font-size:14px;font-weight:400;color:var(--text-2)">'+escapeHTML(s.company||"")+'</span></h2>'
     + '<div style="font-family:var(--mono);font-size:11.5px;color:var(--text-2)">Close ₹'+s.close.toLocaleString("en-IN")+' &middot; Score '+s.score_of_8+'/8 &middot; '+exitTag+'</div></div>'
     + '<button class="sc-btn-ghost" type="button" id="scModalClose">Close</button></div>'
+    + '<div id="scModalChart" class="cc-chart"></div>'
     + '<div class="sc-rule-list">' + checks.map(c =>
       '<div class="sc-rule-row"><div><b>'+escapeHTML(c.name)+'</b><div style="font-size:11px;color:var(--text-2);font-family:var(--mono);margin-top:2px">'+escapeHTML(c.detail)+'</div></div>'
       + '<span class="sc-tag-xs '+(c.ok?'leader':'cut')+'">'+(c.ok?'PASS':'FAIL')+'</span></div>'
     ).join("") + '</div></div>';
   $("scModalClose").addEventListener("click", () => wrap.classList.remove("open"));
   wrap.classList.add("open");
+  if (window.CCChart) CCChart.mount($("scModalChart"), s.symbol, d.market_date);
 }
 
 function buildAIPrompt(d){
@@ -2092,7 +2120,7 @@ MY CURRENT HOLDINGS (paste ticker + buy price or upload your holdings sheet):
 [Paste your holdings here]
 
 Please analyze the uploaded Screener CSV/Excel and give me:
-1. EXIT CHECK: Flag any of my current holdings where Close < SMA150, WeekStatus is REMOVED, or SectorStatus is CUT — so I can exit without emotion.
+1. EXIT CHECK: Flag any of my current holdings that no longer pass all 8 rules (Pass8Rules = FAIL), where Close < SMA150, WeekStatus is REMOVED, or SectorStatus is CUT — so I can exit without emotion.
 2. REGIME CHECK: Confirm whether Market Seatbelt (${d.market_weather.mode}) allows new buys or requires holding Cash.
 3. NEW CANDIDATES (Equal-Weight 15-20 Stocks Max): From rows where Pass8Rules = PASS and SectorStatus = KEEP (prioritizing WeekStatus = ADDED and highest RSPct), list the top candidates to fill open slots, with a 2-line business driver & key balance-sheet/valuation red flag for each.
 4. TRAILING STOP: Output a clean table with Symbol, Close, and exact 150-DMA trailing exit level from the uploaded file.`;
@@ -2138,7 +2166,7 @@ async function renderHome(){
     + '  <div class="home-pillar" id="homeCardScreener">'
     + '    <div class="kicker">01 &middot; Weekly Equity System</div>'
     + '    <h3>Top-1,000 NSE Screener</h3>'
-    + '    <p>Auto-updated every Friday after market close. Combines Nifty 500 Seatbelt, Bottom-3 Sector Cut, 8-Rule Stage-2 template, Smooth Momentum ranking, and 150-DMA trailing exits with weekly history.</p>'
+    + '    <p>Auto-updated every Friday after market close. Combines the Nifty 500 Seatbelt, Bottom-3 Sector Cut, the 8-Rule Stage-2 template and Smooth Momentum ranking, with weekly history. A stock leaves the list the week any of the 8 rules fails; the most common reason is a close below its 150-DMA. Prices are adjusted for splits and bonuses.</p>'
     + '  </div>'
     + '  <div class="home-pillar" id="homeCardCalc">'
     + '    <div class="kicker">02 &middot; Financial Planning</div>'
@@ -2194,7 +2222,8 @@ const BLOG_POSTS = [
     body:[
       "Most retail traders think scanning stocks is about finding a magic indicator. Our 23-year point-in-time NSE study (2003–Sep 2026) tested the 8-rule Minervini Stage-2 Trend Template across the top ~1,000 liquid NSE stocks (median turnover >= ₹1 Cr/day, including delisted companies).",
       "Key findings: (1) All 8 rules kept ~15% of the universe (~81 stocks/month) and compounded at 27.4% CAGR (₹1L -> ₹3.10 Cr), though with a -65.2% drawdown in 2008. (2) Adding the Nifty 500 > 200-DMA Market Seatbelt cut max drawdown nearly in half to -37.2% while delivering 26.3% CAGR (₹1L -> ₹2.51 Cr).",
-      "(3) When >20 stocks qualify, ranking by Smooth Momentum (12-Month Return divided by 60-Day Annualized Volatility) for the Top 20 delivered 30.3% CAGR (₹1L -> ₹5.28 Cr) with lower drawdown (-35.6%) than the unfiltered baseline. Note: backtest results use month-end adjusted close prices with 0.1% buy + 0.2% sell/STT costs, before STCG tax and slippage."
+      "(3) When >20 stocks qualify, ranking by Smooth Momentum (12-Month Return divided by 60-Day Annualized Volatility) for the Top 20 delivered 30.3% CAGR (₹1L -> ₹5.28 Cr) with lower drawdown (-35.6%) than the unfiltered baseline. Note: backtest results use month-end adjusted close prices with 0.1% buy + 0.2% sell/STT costs, before STCG tax and slippage.",
+      "What the numbers do not include: trading at the next day's close instead of the signal day's close lowers the Top 20 Smooth result to 28.9% a year (₹4.10 Cr). The strategy sat in cash for 78 of 284 months, earning an assumed 6% a year. Tax is not counted. The screener updates every week so you can watch it, but the tested rule reviews once a month: a weekly version, traded at the next day's close, gave 21.1% a year (-29.8%), because weekly trading costs more and adds noise. Past results do not predict future results."
     ],
     ctaLabel:"Open Live Screener →",
     ctaTarget:"screener"
@@ -2262,13 +2291,13 @@ const BLOG_POSTS = [
   {
     id:"smooth-vs-raw-rs",
     kicker:"QUANT RESEARCH · MOMENTUM FACTOR",
-    title:"Smooth Momentum vs Raw Returns: Why Volatility-Adjusted Selection Wins",
+    title:"Smooth Momentum vs Raw Returns: A Smoother Ride, Not a Higher Return",
     date:"Nov 2026",
     readTime:"4 min read",
-    summary:"Raw 12-month winners often include erratic, circuit-driven spikes that crash hard on minor pullbacks. Dividing 12M return by 60-day volatility isolates steady institutional compounders.",
+    summary:"Raw 12-month winners often include erratic, circuit-driven spikes. Dividing 12M return by 60-day volatility favours steadier stocks. In our backtest it gave a slightly shallower drawdown, not a higher return.",
     body:[
       "When 80–150 NSE stocks pass all 8 Stage-2 Trend Template rules in a bull market, retail investors cannot buy all of them equally. You need a disciplined tie-breaker to narrow the list to 15–20 names.",
-      "In our 23-year backtest, picking the Top 20 stocks by Smooth Score (12-Month Return ÷ 60-Day Annualized Volatility) outperformed raw 12M return sorting with both higher CAGR (30.3%) and shallower drawdowns (-35.6%).",
+      "In our 23-year backtest (monthly review, market filter on), the Top 20 by Smooth Score (12-Month Return ÷ 60-Day Annualized Volatility) returned 30.3% a year with a -35.6% worst fall. Ranking the same stocks by raw 12-month return returned more, 32.0% a year, with a slightly deeper -38.5% fall. So Smooth Score bought a smoother ride, not a higher return. These figures assume buying and selling at the signal day's close; trading at the next day's close lowers the Smooth result to 28.9% a year.",
       "Smooth Score rewards stocks that grind steadily higher with tight consolidations rather than volatile news-driven spikes — making it far easier to hold through normal 5%–10% pullbacks."
     ],
     ctaLabel:"View Top 20 Smooth Stocks →",
@@ -2467,6 +2496,8 @@ async function renderScreener(){
     .concat(allSectors.map(s => '<option value="'+escapeHTML(s.sector)+'"'+(scState.sector===s.sector?' selected':'')+'>#'+s.rank+' '+escapeHTML(s.sector)+' ('+s.status+')</option>')).join("");
 
   el.innerHTML = ''
+    + '<div id="ccHealth" class="cc-health"></div>'
+    + (isInvest ? '' : '<div class="sc-cash-note"><b>Market filter says CASH.</b> The Nifty 500 is below its 200-day average. In our tested system this means holding cash, so the list below is for watching only, not for buying.</div>')
     + '<div class="sc-head-bar">'
     + '  <div>'
     + '    <div class="kicker" style="margin-bottom:2px">Top 1,000 NSE &middot; Persistent Weekly Memory</div>'
@@ -2547,6 +2578,7 @@ async function renderScreener(){
     ));
 
   $("scDateSelect").addEventListener("change", e => { scState.date = e.target.value; renderScreener(); });
+  if (window.CCHealth) CCHealth.render($("ccHealth"));
   Array.from($("scViewToggle").querySelectorAll("button")).forEach(b => {
     b.addEventListener("click", () => { scState.view = b.dataset.v; renderScreener(); });
   });

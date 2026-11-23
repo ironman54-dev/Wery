@@ -1,0 +1,4 @@
+[
+  {"s": "CCAVENUE", "d": "2026-10-19", "f": 10.0, "note": "face-value consolidation 10:1; NSE's adjusted previous close on 19 Oct 2026 was 138.30 = 10 x 13.83 (checked 24 Nov 2026 with the NSE MCP history)"},
+  {"s": "CONCORDBIO", "d": "2026-11-04", "f": 0.5, "note": "Bonus 1:1, ex-date 4 Nov 2026 (NSE corporate actions via the NSE MCP, 24 Nov 2026)"}
+]

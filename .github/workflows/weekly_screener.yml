@@ -2,10 +2,10 @@ name: Weekly Capital Code Screener Update
 
 on:
   schedule:
-    # Friday 19:00 IST (13:30 UTC): after the NSE close and Yahoo's end-of-day update
-    - cron: '30 13 * * 5'
-    # Saturday 08:00 IST (02:30 UTC): backup run if Friday's failed
-    - cron: '30 2 * * 6'
+    # Friday 20:30 IST (15:00 UTC): the NSE store is topped up at 19:30 IST, this run also nudges it first
+    - cron: '0 15 * * 5'
+    # Saturday 09:00 IST (03:30 UTC): backup run if Friday's failed
+    - cron: '30 3 * * 6'
   workflow_dispatch:
 
 permissions:
@@ -25,7 +25,12 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install yfinance pandas
+        run: pip install yfinance==1.8.0 pandas==3.1.1
+      - name: Make sure the NSE store has the latest session
+        run: |
+          curl -s -m 150 -X POST -H "apikey: $SB_ANON" -H "Authorization: Bearer $SB_ANON" https://mmbdijtyvgzhmnlcddki.supabase.co/functions/v1/bars-append || true
+        env:
+          SB_ANON: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tYmRpanR5dmd6aG1ubGNkZGtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU0NTgxNDIsImV4cCI6MjExMTAzNDE0Mn0.0OQcGYMjAlAKWCUGXHjTd1zDcxid5MCdQFGZmGC_jvI
       - name: Run weekly screener update (3 tries, 15 min apart; stops without writing if the data looks wrong)
         run: |
           for i in 1 2 3; do

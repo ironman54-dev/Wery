@@ -3,7 +3,10 @@ import json
 import statistics
 import sys
 import time
-from datetime import datetime, timezone, timedelta
+import urllib.error
+import urllib.request
+from concurrent.futures import ThreadPoolExecutor
+from datetime import date, datetime, timezone, timedelta
 from pathlib import Path
 import pandas as pd
 import yfinance as yf
@@ -53,6 +56,8 @@ def load_universe() -> list[dict]:
             name = (row.get("Company Name") or sym).strip()
             if not sym or sym.startswith("DUMMY"):
                 continue
+            if any(k in name.upper() for k in ("REIT", "REAL ESTATE TRUST", "INVIT", "INFRASTRUCTURE INVESTMENT TRUST")):
+                continue   # REITs / InvITs are not operating companies: the 8-rule template is not meant for them
             universe.append({
                 "symbol": sym,
                 "yf_ticker": f"{sym}.NS",
@@ -95,6 +100,131 @@ def download_batched(tickers: list[str], batch_size: int = 120):
     c = pd.concat(closes, axis=1)
     v = pd.concat(vols, axis=1)
     return c.loc[:, ~c.columns.duplicated()], v.loc[:, ~v.columns.duplicated()]
+
+
+# ---------------------------------------------------------------- primary data source: NSE end-of-day store in Supabase
+# Raw NSE bhavcopy prices + a short list of split/bonus events (see scripts/bars_pipeline.py and the bars-append function).
+# Prices are adjusted for splits and bonuses only, the same way the Video 7 backtest adjusted them (no dividend adjustment).
+SB = "https://mmbdijtyvgzhmnlcddki.supabase.co"
+ANON = ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tYmRpanR5dmd6aG1ubGNkZGtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU0NTgxNDIsImV4cCI6MjExMTAzNDE0Mn0."
+        "0OQcGYMjAlAKWCUGXHjTd1zDcxid5MCdQFGZmGC_jvI")   # public anon key by design; the store only answers read functions to it
+CLEAN = sorted({a / b for b in range(2, 13) for a in range(1, b)} | {1 / 20, 1 / 25, 1 / 50, 1 / 100})
+
+
+def clean_fraction(r, tol):
+    best = min(CLEAN, key=lambda f: abs(r / f - 1))
+    return best if abs(r / best - 1) <= tol else None
+
+
+def store_rpc(fn, body, tries=3):
+    last = None
+    for k in range(tries):
+        try:
+            req = urllib.request.Request(f"{SB}/rest/v1/rpc/{fn}", data=json.dumps(body).encode(),
+                                         headers={"apikey": ANON, "Authorization": "Bearer " + ANON, "Content-Type": "application/json"})
+            return json.loads(urllib.request.urlopen(req, timeout=90).read())
+        except Exception as e:
+            last = e
+            time.sleep(3 * (k + 1))
+    raise RuntimeError(f"{fn} failed: {last}")
+
+
+def _adjusted(raw):
+    if not raw or not raw.get("d"):
+        return None, None
+    idx = pd.to_datetime(raw["d"], unit="D")
+    c = pd.Series(raw["c"], index=idx, dtype="float64") / 100.0
+    v = pd.Series(raw["v"], index=idx, dtype="float64")
+    f = pd.Series(1.0, index=idx)
+    for dte, fac in sorted((pd.Timestamp(e[0]), float(e[1])) for e in (raw.get("ev") or [])):
+        f[idx < dte] *= fac          # a split on dte changes every older price
+    return c * f, v / f
+
+
+def load_store(universe):
+    """Returns (n500_close, closes_df, volumes_df, info). Raises if the store is unreachable or incomplete."""
+    st = store_rpc("cc_bars_status", {})
+    since = (date.today() - timedelta(days=1250) - date(1970, 1, 1)).days
+    syms = [u["symbol"] for u in universe]
+
+    def get(sym):
+        return sym, store_rpc("cc_stock_bars", {"p_symbol": sym, "p_since": since})
+
+    with ThreadPoolExecutor(12) as ex:
+        res = dict(ex.map(get, ["NIFTY500"] + syms))
+    n500, _ = _adjusted(res.pop("NIFTY500"))
+    if n500 is None or len(n500) < 700:
+        raise RuntimeError("Nifty 500 series missing in the store")
+    cl, vo = {}, {}
+    for sym, raw in res.items():
+        c, v = _adjusted(raw)
+        if c is not None:
+            cl[sym + ".NS"], vo[sym + ".NS"] = c, v
+    if len(cl) < 0.9 * len(syms):
+        raise RuntimeError(f"store has bars for only {len(cl)} of {len(syms)} symbols")
+    return n500.dropna(), pd.DataFrame(cl).sort_index(), pd.DataFrame(vo).sort_index(), {"last_day": st.get("last_day"), "symbols_in_store": st.get("symbols")}
+
+
+def nse_had_session(day):
+    """True / False / None (unknown). Same rule as the Aria desk's calendar: a day is a session only if NSE's file for that day
+    carries that day's own date (NSE's older archive serves the previous session's file for a non-session date)."""
+    url = f"https://nsearchives.nseindia.com/content/indices/ind_close_all_{day:%d%m%Y}.csv"
+    for k in range(3):
+        try:
+            head = urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"}), timeout=40).read(4000).decode("latin-1")
+            for line in head.splitlines()[1:6]:
+                cells = line.split(",")
+                if len(cells) > 2:
+                    return cells[1].strip() == f"{day:%d-%m-%Y}"
+            return None
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                return False
+            time.sleep(3 * (k + 1))
+        except Exception:
+            time.sleep(3 * (k + 1))
+    return None
+
+
+def unexplained_jumps(stk_df, events_note=None):
+    """Adjusted series should be smooth where splits are known. A leftover one-day jump that looks like a split (or a
+    reverse split) means an event is missing: that stock is held out of this run and listed for review."""
+    bad = {}
+    r = stk_df / stk_df.shift(1)
+    for t in stk_df.columns:
+        x = r[t].dropna().tail(270)   # only jumps that can still affect today's indicators (older ones are history)
+        for d, v in x[(x < 0.62) | (x > 1.75)].items():
+            f = clean_fraction(v, 0.06) if v < 1 else (lambda g: (1 / g) if g else None)(clean_fraction(1 / v, 0.06))
+            if f:
+                bad.setdefault(t[:-3], []).append((d.date().isoformat(), round(float(v), 4)))
+    return bad
+
+
+def yahoo_crosscheck(stk_df, tickers_sample=None):
+    """Independent check of the latest raw close against Yahoo. Non-blocking unless many stocks disagree."""
+    try:
+        cols = list(stk_df.columns)
+        out, bad = 0, []
+        for i in range(0, len(cols), 120):
+            chunk = cols[i:i + 120]
+            df = yf.download(chunk, period="7d", interval="1d", progress=False, auto_adjust=False)
+            cdf = df["Close"] if isinstance(df.columns, pd.MultiIndex) else df[["Close"]].rename(columns={"Close": chunk[0]})
+            cdf.index = pd.to_datetime(cdf.index).tz_localize(None)
+            for t in chunk:
+                if t not in cdf.columns:
+                    continue
+                a = stk_df[t].dropna()
+                y = cdf[t].dropna()
+                common = a.index.intersection(y.index)
+                if len(common) == 0:
+                    continue
+                d = common[-1]
+                out += 1
+                if abs(a[d] / y[d] - 1) > 0.005:
+                    bad.append((t[:-3], d.date().isoformat(), round(float(a[d]), 2), round(float(y[d]), 2)))
+        return {"checked": out, "mismatch": bad}
+    except Exception as e:
+        return {"checked": 0, "mismatch": [], "error": str(e)[:120]}
 
 
 MIN_LIQUID_TURNOVER = 1e7   # Rs 1 crore median daily turnover over 60 sessions (the backtest's universe rule)
@@ -247,7 +377,10 @@ def apply_chronological_tracking(snapshots: dict, sorted_dates: list[str], adj):
     for idx, dt in enumerate(sorted_dates):
         snap = snapshots[dt]
         dt_obj = datetime.strptime(dt, "%Y-%m-%d").date()
-        prev_qual = {r["symbol"]: r for r in prev_snap["stocks"] if r["qualifies"]} if prev_snap else {}
+        # In a CASH week (Nifty 500 below its 200-DMA) the tested system holds cash: nothing is held, nothing is "new".
+        cash = (snap.get("market_weather") or {}).get("mode") == "CASH"
+        prev_cash = bool(prev_snap and (prev_snap.get("market_weather") or {}).get("mode") == "CASH")
+        prev_qual = {r["symbol"]: r for r in prev_snap["stocks"] if r["qualifies"] and not prev_cash} if prev_snap else {}
         cur_by_sym = {r["symbol"]: r for r in snap["stocks"]}
         added = []
         removed = []
@@ -255,7 +388,7 @@ def apply_chronological_tracking(snapshots: dict, sorted_dates: list[str], adj):
 
         for r in snap["stocks"]:
             sym = r["symbol"]
-            if r["qualifies"]:
+            if r["qualifies"] and not cash:
                 cur_px = adj(sym, dt) or r["close"]
                 if sym not in tracker:
                     tracker[sym] = {"entry_date": dt, "entry_price": cur_px}
@@ -287,7 +420,7 @@ def apply_chronological_tracking(snapshots: dict, sorted_dates: list[str], adj):
                 ent = tracker.pop(sym, {"entry_date": prev_snap["market_date"] if prev_snap else dt,
                                         "entry_price": adj(sym, prev_snap["market_date"] if prev_snap else dt) or prev_qual[sym]["close"]})
                 days_in = (dt_obj - datetime.strptime(ent["entry_date"], "%Y-%m-%d").date()).days
-                reason = "Broke 150-DMA" if r["dma150_exit_broken"] else ("Sector Cut" if r["sector_cut"] else f"Dropped <8/8 ({r['score_of_8']}/8)")
+                reason = ("Market filter: CASH" if cash else "Broke 150-DMA" if r["dma150_exit_broken"] else ("Sector Cut" if r["sector_cut"] else f"Dropped <8/8 ({r['score_of_8']}/8)"))
                 ret_trade = safe_pct(cur_px, ent["entry_price"])
                 r["entry_date"] = ent["entry_date"]
                 r["entry_price"] = ent["entry_price"]
@@ -338,43 +471,70 @@ def main():
     now = datetime.now(ist)
     now_ist = now.strftime("%d %b %Y, %I:%M %p IST")
 
-    n500 = None
-    for k in range(3):
-        try:
-            n500 = yf.download("^CRSLDX", period="3y", interval="1d", progress=False, auto_adjust=True)
-            if not n500.empty:
-                break
-        except Exception as e:
-            print(f"index download error ({e})")
-        time.sleep(5 * (k + 1))
-    if n500 is None or n500.empty:
-        fail("Nifty 500 index download failed")
-    if isinstance(n500.columns, pd.MultiIndex):
-        n500_c = n500["Close"].iloc[:, 0].dropna()
-    else:
-        n500_c = n500["Close"].dropna()
-    n500_c.index = pd.to_datetime(n500_c.index).tz_localize(None)
-
     universe = load_universe()
     tickers = [u["yf_ticker"] for u in universe]
-    stk_df, vol_df = download_batched(tickers, batch_size=120)
-    if stk_df.empty:
-        fail("no stock data downloaded")
+    data_source, store_info, review_hold, ycheck = "store", {}, {}, {}
+    try:
+        n500_c, stk_df, vol_df, store_info = load_store(universe)
+    except Exception as e:
+        print("NSE store unavailable, falling back to Yahoo:", e)
+        data_source = "yahoo-fallback"
+        n500 = None
+        for k in range(3):
+            try:
+                n500 = yf.download("^CRSLDX", period="3y", interval="1d", progress=False, auto_adjust=True)
+                if not n500.empty:
+                    break
+            except Exception as e2:
+                print(f"index download error ({e2})")
+            time.sleep(5 * (k + 1))
+        if n500 is None or n500.empty:
+            fail("Nifty 500 index download failed (store and Yahoo both unavailable)")
+        n500_c = n500["Close"].iloc[:, 0].dropna() if isinstance(n500.columns, pd.MultiIndex) else n500["Close"].dropna()
+        stk_df, vol_df = download_batched(tickers, batch_size=120)
+        if stk_df.empty:
+            fail("no stock data downloaded")
+    n500_c.index = pd.to_datetime(n500_c.index).tz_localize(None)
     stk_df.index = pd.to_datetime(stk_df.index).tz_localize(None)
     vol_df.index = pd.to_datetime(vol_df.index).tz_localize(None)
+
+    # held-out stocks: an unexplained split-like jump means a corporate action is missing from the data
+    review_hold = unexplained_jumps(stk_df)
+    if review_hold:
+        print("HELD OUT for review (unexplained jumps):", {k: v for k, v in list(review_hold.items())[:20]})
+        keep = [c for c in stk_df.columns if c[:-3] not in review_hold]
+        stk_df, vol_df = stk_df[keep], vol_df[[c for c in vol_df.columns if c in keep]]
+    if len(review_hold) > 0.03 * len(tickers):
+        fail(f"{len(review_hold)} stocks show unexplained jumps; refusing to publish")
+    ycheck = yahoo_crosscheck(stk_df)
+    print("Yahoo cross-check:", ycheck["checked"], "compared,", len(ycheck["mismatch"]), "differ", ycheck.get("error", ""))
+    if ycheck["checked"] > 200 and len(ycheck["mismatch"]) > 0.03 * ycheck["checked"]:
+        fail(f"{len(ycheck['mismatch'])} of {ycheck['checked']} latest closes disagree with Yahoo; refusing to publish")
 
     # ---- sanity checks: stop BEFORE writing anything if the download looks wrong
     if len(n500_c) < 700:
         fail(f"Nifty 500 history too short ({len(n500_c)} bars)")
     last_bar = n500_c.index[-1]
-    if (now.replace(tzinfo=None) - last_bar.to_pydatetime()).days > 7:
-        fail(f"Nifty 500 latest bar is {last_bar.date()}, more than 7 days old")
+    if (now.replace(tzinfo=None) - last_bar.to_pydatetime()).days > 4:
+        fail(f"Nifty 500 latest bar is {last_bar.date()}, more than 4 days old")
+    # On a run after the week has ended, that week's Friday must be in the data, unless NSE had no session that day.
+    freshness_note = ""
+    p = pd.Timestamp(now.date()).to_period("W-FRI")
+    if now.weekday() == 5 or now.weekday() == 6 or (now.weekday() == 4 and now.hour >= 19):
+        fri = p.end_time.date() if now.weekday() <= 4 else (p - 1).end_time.date()
+        if last_bar.date() < fri:
+            had = nse_had_session(fri)
+            if had is True:
+                fail(f"NSE traded on {fri} but the newest bar in the data is {last_bar.date()}; the data is not up to date yet")
+            if had is None:
+                freshness_note = f"could not confirm whether NSE traded on {fri}; newest bar is {last_bar.date()}"
+                print("WARNING:", freshness_note)
     long_enough = sum(1 for t in tickers if t in stk_df.columns and stk_df[t].dropna().shape[0] >= 260)
     fresh = sum(1 for t in tickers if t in stk_df.columns and not stk_df[t].dropna().empty
-                and (last_bar - stk_df[t].dropna().index[-1]).days <= 5)
-    if long_enough < 0.85 * len(tickers):
+                and (last_bar - stk_df[t].dropna().index[-1]).days <= 3)
+    if long_enough < 0.95 * len(tickers):
         fail(f"only {long_enough} of {len(tickers)} stocks have enough history")
-    if fresh < 0.85 * len(tickers):
+    if fresh < 0.95 * len(tickers):
         fail(f"only {fresh} of {len(tickers)} stocks have a recent price")
     prev_idx = HIST_DIR / "index.json"
     if prev_idx.exists():
@@ -385,23 +545,38 @@ def main():
         except json.JSONDecodeError:
             pass
 
-    # Build 53 weekly checkpoints (~12 months) so entry_date & 6M+ streak are accurate, while keeping dropdown to recent 9 weeks!
+    # Weekly checkpoints = the last trading day of each COMPLETE week (Friday, or the last session before a holiday).
+    # A run in the middle of a week never creates a half-week snapshot.
     existing_dates = {p.stem for p in HIST_DIR.glob("*.json") if p.stem != "index"}
     rebuild = "--rebuild" in sys.argv
-    offsets_to_build = list(range(260, -1, -5)) if (rebuild or len(existing_dates) < 50) else [0]
+    idx = n500_c.index
+    per = idx.to_period("W-FRI")
+    week_end_pos = list(pd.Series(range(len(idx)), index=idx).groupby(per).max().values)
+    now_period = pd.Timestamp(now.date()).to_period("W-FRI")
+    week_complete = (last_bar.to_period("W-FRI") < now_period) or (now.weekday() == 4 and now.hour >= 19)
+    if not week_complete:
+        week_end_pos = week_end_pos[:-1]
+    week_end_pos = week_end_pos[-53:]
+    if not rebuild and len(existing_dates) >= 50:
+        week_end_pos = week_end_pos[-1:]
+    offsets_to_build = [len(idx) - 1 - p for p in week_end_pos]
 
     snapshots = {}
     for off in offsets_to_build:
         snap = evaluate_snapshot(n500_c, stk_df, vol_df, universe, offset_bars=off)
-        snap["updated_at_ist"] = now_ist if off == 0 else f"Weekly Close ({snap['market_date']})"
+        snap["updated_at_ist"] = now_ist if off == offsets_to_build[-1] else f"Weekly Close ({snap['market_date']})"
         snapshots[snap["market_date"]] = snap
+    new_periods = {pd.Timestamp(d).to_period("W-FRI"): d for d in snapshots}
 
-    if rebuild:   # keep (do not delete) snapshots made by an older method that no new snapshot replaces
-        old_dir = HIST_DIR / "_old_method"
-        old_dir.mkdir(exist_ok=True)
-        for p in list(HIST_DIR.glob("*.json")):
-            if p.stem != "index" and p.stem not in snapshots:
-                p.replace(old_dir / p.name)
+    # Keep (never delete) snapshots from an older method, or from the same week with a different last day.
+    keep_dir = HIST_DIR / "_superseded"
+    for p in list(HIST_DIR.glob("*.json")):
+        if p.stem == "index" or p.stem in snapshots:
+            continue
+        same_week = pd.Timestamp(p.stem).to_period("W-FRI") in new_periods
+        if rebuild or same_week:
+            keep_dir.mkdir(exist_ok=True)
+            p.replace(keep_dir / p.name)
     for p in HIST_DIR.glob("*.json"):
         if p.stem == "index" or p.stem in snapshots:
             continue
@@ -447,10 +622,24 @@ def main():
                 r["score_of_8"], "PASS" if r["pass_8_rules"] else "FAIL"
             ])
 
+    issues = []
+    if data_source != "store":
+        issues.append("This week's screener used backup data from Yahoo because the NSE price store was unavailable.")
+    if review_hold:
+        issues.append(f"{len(review_hold)} stock(s) are held out of this list because of an unexplained price jump (a possible missed split): " + ", ".join(sorted(review_hold)[:12]) + ".")
+    if freshness_note:
+        issues.append(freshness_note[0].upper() + freshness_note[1:] + ".")
+    if ycheck.get("error"):
+        issues.append("The independent price check against Yahoo could not run (" + ycheck["error"] + ").")
+    if ycheck.get("mismatch"):
+        issues.append(f"{len(ycheck['mismatch'])} latest close(s) differ from Yahoo's: " + ", ".join(m[0] for m in ycheck["mismatch"][:10]) + ". The NSE value is shown.")
     (OUT_DIR / "status.json").write_text(json.dumps({
+        "updated_utc": datetime.now(timezone.utc).isoformat(), "issues": issues,
         "ok": True, "updated_at_ist": now_ist, "market_date": latest["market_date"],
         "universe": len(universe), "scanned": latest["summary"]["total_scanned"],
         "qualifying": latest["summary"]["pass_8_leading_sectors"],
+        "data_source": data_source, "freshness_note": freshness_note, "held_out_for_review": review_hold,
+        "yahoo_crosscheck": {"checked": ycheck.get("checked", 0), "differ": ycheck.get("mismatch", [])[:30]},
     }, indent=2), encoding="utf-8")
 
     for dt in visible_dates:
