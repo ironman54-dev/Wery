@@ -863,7 +863,7 @@ html[data-theme="dark"] .sc-streak-badge{background:rgba(232,196,106,0.16);color
     </div>
     </div>
     <div class="foot-links no-print"><a href="/privacy/">Privacy Policy</a><a href="/terms/">Terms of Use</a><a href="/disclaimer/">Disclaimer</a><a href="/cookies/">Cookies</a></div>
-    <b>Disclaimer.</b> Educational &amp; research tool only &mdash; not SEBI-registered investment advice. Screener signals and backtests use historical NSE close prices (excluding STCG tax &amp; slippage) and do not guarantee future returns. Consult a qualified advisor before investing.
+    <b>Disclaimer.</b> Educational &amp; research tool only &mdash; not SEBI-registered investment advice. Screener signals and backtests use historical NSE prices, reviewed weekly with trades at the next open (excluding tax &amp; slippage), and do not guarantee future returns. Consult a qualified advisor before investing.
   </footer>
 </div>
 
@@ -2215,15 +2215,14 @@ const BLOG_POSTS = [
   {
     id:"stage2-23yr",
     kicker:"23-YEAR NSE BACKTEST · SYSTEM",
-    title:"How ₹1 Lakh Compounded to ₹5.28 Crore Using 8 Rules + Smooth Momentum",
+    title:"How ₹1 Lakh Compounded to ₹9.9 Crore Using 8 Rules + Smooth Momentum",
     date:"Nov 2026",
     readTime:"6 min read",
-    summary:"Across 284 months of point-in-time NSE data (2003–Sep 2026, including delisted stocks), filtering Stage-2 leaders with a Nifty 500 > 200-DMA seatbelt turned ₹1L into ₹2.51 Cr — and ranking the Top 20 by Smooth Momentum (12M ÷ 60d Vol) lifted it to ₹5.28 Cr (30.3% CAGR) with -35.6% max drawdown.",
+    summary:"Across 1,239 weeks of point-in-time NSE data (2003–Sep 2026, including delisted stocks), filtering Stage-2 leaders with a Nifty 500 > 200-DMA seatbelt turned ₹1L into ₹2.36 Cr — and ranking the Top 20 by Smooth Momentum (12M ÷ 60d Vol) lifted it to ₹9.93 Cr (33.6% CAGR) with -39.8% max drawdown.",
     body:[
       "Most retail traders think scanning stocks is about finding a magic indicator. Our 23-year point-in-time NSE study (2003–Sep 2026) tested the 8-rule Minervini Stage-2 Trend Template across the top ~1,000 liquid NSE stocks (median turnover >= ₹1 Cr/day, including delisted companies).",
-      "Key findings: (1) All 8 rules kept ~15% of the universe (~81 stocks/month) and compounded at 27.4% CAGR (₹1L -> ₹3.10 Cr), though with a -65.2% drawdown in 2008. (2) Adding the Nifty 500 > 200-DMA Market Seatbelt cut max drawdown nearly in half to -37.2% while delivering 26.3% CAGR (₹1L -> ₹2.51 Cr).",
-      "(3) When >20 stocks qualify, ranking by Smooth Momentum (12-Month Return divided by 60-Day Annualized Volatility) for the Top 20 delivered 30.3% CAGR (₹1L -> ₹5.28 Cr) with lower drawdown (-35.6%) than the unfiltered baseline. Note: backtest results use month-end adjusted close prices with 0.1% buy + 0.2% sell/STT costs, before STCG tax and slippage.",
-      "What the numbers do not include: trading at the next day's close instead of the signal day's close lowers the Top 20 Smooth result to 28.9% a year (₹4.10 Cr). The strategy sat in cash for 78 of 284 months, earning an assumed 6% a year. Tax is not counted. The screener updates every week so you can watch it, but the tested rule reviews once a month: a weekly version, traded at the next day's close, gave 21.1% a year (-29.8%), because weekly trading costs more and adds noise. Past results do not predict future results."
+      "Key findings: (1) All 8 rules kept ~15% of the universe (~81 stocks) and compounded at 21.0% CAGR (₹1L -> ₹0.95 Cr), though with a -65.8% drawdown in 2008. (2) Adding the Nifty 500 > 200-DMA Market Seatbelt cut max drawdown to -40.1% and lifted the result to 25.8% CAGR (₹1L -> ₹2.36 Cr).",
+      "(3) When >20 stocks qualify, ranking by Smooth Momentum (12-Month Return divided by 60-Day Annualized Volatility) for the Top 20 delivered 33.6% CAGR (₹1L -> ₹9.93 Cr) with a -39.8% drawdown. Note: weekly review, signals after Friday's close, buying at the next trading day's open, 0.1% buy + 0.2% sell/STT costs, before tax and price impact. In cash weeks the system holds cash, assumed to earn 6% a year. Past results do not predict future results."
     ],
     ctaLabel:"Open Live Screener →",
     ctaTarget:"screener"
@@ -2291,13 +2290,13 @@ const BLOG_POSTS = [
   {
     id:"smooth-vs-raw-rs",
     kicker:"QUANT RESEARCH · MOMENTUM FACTOR",
-    title:"Smooth Momentum vs Raw Returns: A Smoother Ride, Not a Higher Return",
+    title:"Smooth Momentum vs Raw Returns: Which Top 20 Works Better?",
     date:"Nov 2026",
     readTime:"4 min read",
-    summary:"Raw 12-month winners often include erratic, circuit-driven spikes. Dividing 12M return by 60-day volatility favours steadier stocks. In our backtest it gave a slightly shallower drawdown, not a higher return.",
+    summary:"Raw 12-month winners often include erratic, circuit-driven spikes. Dividing 12M return by 60-day volatility favours steadier stocks. In our weekly backtest it returned more than raw ranking with the same worst fall.",
     body:[
       "When 80–150 NSE stocks pass all 8 Stage-2 Trend Template rules in a bull market, retail investors cannot buy all of them equally. You need a disciplined tie-breaker to narrow the list to 15–20 names.",
-      "In our 23-year backtest (monthly review, market filter on), the Top 20 by Smooth Score (12-Month Return ÷ 60-Day Annualized Volatility) returned 30.3% a year with a -35.6% worst fall. Ranking the same stocks by raw 12-month return returned more, 32.0% a year, with a slightly deeper -38.5% fall. So Smooth Score bought a smoother ride, not a higher return. These figures assume buying and selling at the signal day's close; trading at the next day's close lowers the Smooth result to 28.9% a year.",
+      "In our 23-year weekly backtest (market filter on, buying at the next trading day's open), the Top 20 by Smooth Score (12-Month Return ÷ 60-Day Annualized Volatility) returned 33.6% a year with a -39.8% worst fall. Ranking the same stocks by raw 12-month return gave 29.5% a year with a -39.6% fall. The gap is not constant: in a monthly version of the test raw returns did slightly better.",
       "Smooth Score rewards stocks that grind steadily higher with tight consolidations rather than volatile news-driven spikes — making it far easier to hold through normal 5%–10% pullbacks."
     ],
     ctaLabel:"View Top 20 Smooth Stocks →",
