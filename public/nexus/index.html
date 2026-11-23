@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexus by The Capital Code: your money, private, on your phone</title>
+<meta name="description" content="Your own private money app: net worth, spends, dues, market signals and an AI you can ask in plain words, all on your phone. Link your family with one code if you want to. Beta batch 1 is full; join the waitlist for batch 2.">
+<meta name="theme-color" content="#f5f6f8">
+<meta property="og:title" content="Nexus by The Capital Code: your money, private, on your phone">
+<meta property="og:description" content="Net worth, spends, dues and signals in one private app, with an AI that runs on your phone. Batch 1 is full. Batch 2 waitlist is open.">
+<meta property="og:image" content="/nexus/img/s-hub.webp?v=20261123b">
+<link rel="icon" href="/nexus/img/mark-sm.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f6f8; --bg2:#eceef3; --card:#ffffff; --ink:#0f1729; --ink2:#3d4658; --mute:#6b7385; --line:#e2e5ec;
+  --navy:#111a2e; --navy2:#1c2640; --acc:#2a5ce8; --accT:#e8eefd; --gold:#a8822f; --goldT:#f6efe0;
+  --green:#178a52; --greenT:#e3f4ea; --violet:#7a5af0; --violetT:#efeafe; --teal:#0f8f86; --red:#d23a4c;
+  --r:22px; --shadow:0 1px 2px rgba(15,23,41,.05),0 12px 40px -12px rgba(15,23,41,.18);
+  --f:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif; --s:'Instrument Serif',Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font:400 17px/1.6 var(--f);color:var(--ink);background:var(--bg);overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(1160px,100% - 40px);margin:0 auto}
+em.s{font:italic 400 1.06em var(--s);letter-spacing:0}
+:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:6px}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid transparent;transition:border-color .2s}
+.nav.scrolled{border-bottom-color:var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:28px;height:68px}
+.brand{display:flex;align-items:center;gap:10px;font:800 20px var(--f);letter-spacing:-.02em}
+.eyebrow{font-weight:800;font-size:14px;letter-spacing:.06em;padding:9px 18px}
+.usp-line{font:800 clamp(34px,5.2vw,68px)/1.04 var(--f);letter-spacing:-.035em;text-align:center;max-width:18ch;margin:0 auto;color:var(--ink)}
+.usp-line span{color:var(--acc)}
+@media (max-width:560px){.eyebrow{font-size:12px;letter-spacing:.04em;padding:8px 14px}}
+.apps2{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.app2{display:flex;flex-direction:column;background:linear-gradient(180deg,var(--tint) 0%,#fff 62%);border:1px solid var(--line);border-radius:28px;padding:24px 22px 0;overflow:hidden;height:470px;transition:transform .25s,box-shadow .25s}
+.app2:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.app2 .ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;margin-bottom:14px;background:#fff}
+.app2 h3{font:800 22px var(--f);letter-spacing:-.02em}
+.app2 p{font-size:15px;color:var(--ink2);margin-top:4px;line-height:1.45}
+.app2 .peek{margin:auto auto 0;width:76%;border:6px solid #0d1322;border-bottom:0;border-radius:30px 30px 0 0;overflow:hidden;background:#fff;box-shadow:0 -10px 30px -12px rgba(15,23,41,.35);transform:translateY(14px);transition:transform .3s}
+.app2:hover .peek{transform:translateY(0)}
+.app2 .peek img{width:100%;height:auto;object-position:top}
+@media (max-width:980px){.apps2{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.apps2{grid-template-columns:1fr}.app2{height:440px}}
+#ai .wrap + .wrap{grid-template-columns:1.2fr .8fr;gap:36px}
+#ai .shot.three .phone{width:min(32%,250px)}
+@media (max-width:980px){#ai .wrap + .wrap{grid-template-columns:1fr}}
+.brand img{width:28px;height:auto}
+.brand .by{font:600 11px var(--f);letter-spacing:.12em;text-transform:uppercase;color:var(--mute);align-self:flex-end;padding-bottom:3px;margin-left:-2px}
+@media (max-width:560px){.brand .by{display:none}}
+.nav nav{display:flex;gap:24px;margin-left:auto;font:500 15px var(--f);color:var(--ink2)}
+.nav nav a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 22px;border-radius:99px;font:600 15px var(--f);border:0;cursor:pointer;transition:transform .15s ease,background .15s,box-shadow .15s;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--acc);color:#fff;box-shadow:0 8px 24px -8px rgba(42,92,232,.55)}
+.btn-p:hover{background:#2350d1}
+.btn-g{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn-g:hover{border-color:#cfd4de}
+.nav .btn{height:40px;padding:0 18px;font-size:14px}
+
+/* hero */
+.hero{padding:72px 0 40px;position:relative}
+.hero:before{content:"";position:absolute;inset:-120px 0 auto;height:620px;background:radial-gradient(600px 300px at 78% 30%,rgba(42,92,232,.13),transparent 70%),radial-gradient(420px 260px at 92% 70%,rgba(168,130,47,.12),transparent 70%);pointer-events:none;z-index:-1}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font:600 13px var(--f);letter-spacing:.08em;text-transform:uppercase;color:var(--acc);background:var(--accT);padding:7px 14px;border-radius:99px}
+.eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--acc)}
+h1{font:800 clamp(42px,6.2vw,76px)/1.02 var(--f);letter-spacing:-.035em;margin:22px 0 22px}
+.lede{font-size:clamp(18px,1.6vw,21px);color:var(--ink2);max-width:33ch}
+.join{display:flex;gap:10px;margin-top:32px;max-width:480px;flex-wrap:wrap}
+.join input{flex:1 1 220px;height:50px;border-radius:99px;border:1px solid var(--line);background:var(--card);padding:0 20px;font:500 16px var(--f);color:var(--ink)}
+.join input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 4px var(--accT)}
+.join .btn{height:50px}
+.fine{font-size:14px;color:var(--mute);margin-top:14px}
+.fine b{color:var(--ink2);font-weight:600}
+.trust{display:flex;gap:18px;flex-wrap:wrap;margin-top:28px;font:500 14px var(--f);color:var(--ink2)}
+.trust span{display:inline-flex;align-items:center;gap:7px}
+.trust svg{color:var(--green)}
+
+/* phones */
+.phones{position:relative;height:640px}
+.phone{position:absolute;width:290px;aspect-ratio:390/844;border-radius:44px;background:#0d1322;padding:9px;box-shadow:0 40px 80px -30px rgba(15,23,41,.45),0 0 0 1px rgba(15,23,41,.06)}
+.phone img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:36px;background:var(--bg)}
+.phone.a{left:50%;top:0;transform:translateX(-30%) rotate(2deg);z-index:2}
+.phone.b{left:50%;top:70px;transform:translateX(-95%) rotate(-6deg);z-index:1;opacity:.97}
+.phone.sm{width:250px}
+.chip{position:absolute;z-index:3;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow);font:500 13px/1.35 var(--f);color:var(--ink2);max-width:220px}
+.chip b{display:block;font:700 15px var(--f);color:var(--ink)}
+.chip.c1{right:-34px;top:300px}
+.chip.c2{left:-10px;bottom:40px}
+
+/* app strip */
+.apps{padding:36px 0 24px}
+.apps .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.app{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;transition:transform .2s,box-shadow .2s}
+.app:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.app .ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;margin-bottom:14px}
+.app h3{font:700 19px var(--f);letter-spacing:-.01em}
+.app p{font-size:15px;color:var(--ink2);margin-top:4px;line-height:1.5}
+
+/* feature sections */
+section.f{padding:96px 0}
+section.f .wrap{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+section.f.rev .copy{order:2}
+.kick{font:700 13px var(--f);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+h2{font:800 clamp(32px,4vw,50px)/1.06 var(--f);letter-spacing:-.03em;margin-bottom:18px}
+.copy>p{font-size:18px;color:var(--ink2);max-width:46ch}
+ul.pts{list-style:none;margin-top:26px;display:grid;gap:14px}
+ul.pts li{display:grid;grid-template-columns:26px 1fr;gap:12px;font-size:16px;color:var(--ink2)}
+ul.pts li b{color:var(--ink);font-weight:600}
+ul.pts .tick{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;margin-top:1px}
+.shot{position:relative;display:flex;justify-content:center;gap:22px}
+.shot .phone{position:relative;left:auto;top:auto;transform:none}
+.shot .phone.tilt{transform:translateY(40px)}
+.infog{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.infog img{width:100%;height:auto;border-radius:22px;box-shadow:var(--shadow)}
+.infog img:first-child{grid-row:1/3;align-self:center}
+@media (max-width:560px){.infog{gap:10px}.infog img{border-radius:16px}}
+.chipx{font:600 14px var(--f);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:9px 16px;color:var(--ink2)}
+.shot.three{gap:12px}
+.shot.three .phone{width:min(31%,196px);border-radius:30px;padding:6px}
+.shot.three .phone img{border-radius:25px}
+.shot.three .phone:nth-child(2){transform:translateY(34px)}
+@media (max-width:560px){.shot.three .phone{width:31%;border-radius:20px;padding:4px}.shot.three .phone img{border-radius:16px}.shot.three .phone:nth-child(2){display:block;transform:translateY(18px)}}
+.band{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+
+/* capital highlight */
+.cap{background:var(--navy);color:#e8ecf5;border-radius:36px;margin:0 20px;padding:88px 0;overflow:hidden;position:relative}
+.cap:before{content:"";position:absolute;inset:auto -10% -40% auto;width:700px;height:500px;background:radial-gradient(closest-side,rgba(42,92,232,.35),transparent);pointer-events:none}
+.cap .wrap{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;position:relative}
+.cap h2{color:#fff}
+.cap .copy>p{color:#b9c1d4}
+.cap ul.pts li{color:#b9c1d4}
+.cap ul.pts li b{color:#fff}
+.cap .kick{color:#e3c27a}
+.cap .note{margin-top:26px;font-size:13.5px;color:#8a93a8;border-top:1px solid #26314d;padding-top:16px;max-width:52ch}
+.stat{display:flex;gap:28px;margin-top:30px;flex-wrap:wrap}
+.stat div{font:500 14px var(--f);color:#8a93a8}
+.stat b{display:block;font:800 30px var(--f);color:#fff;letter-spacing:-.02em}
+
+/* sms demo */
+.sms{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);max-width:430px;width:100%}
+.sms .msg{font:500 14px/1.5 ui-monospace,'SF Mono',Menlo,monospace;background:var(--bg);border-radius:14px;padding:14px;color:var(--ink2)}
+.sms .msg small{display:block;font:600 11px var(--f);letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+.sms .checks{display:grid;gap:9px;margin:16px 2px}
+.sms .checks div{display:flex;justify-content:space-between;font-size:14.5px;color:var(--ink2)}
+.sms .checks span:last-child{font-weight:600;color:var(--green)}
+.sms .card{display:flex;justify-content:space-between;align-items:center;background:var(--greenT);border-radius:14px;padding:14px 16px}
+.sms .card b{font:700 16px var(--f)}
+.sms .card small{display:block;font-size:13px;color:var(--ink2)}
+.sms .card .amt{font:800 20px var(--f);color:var(--green)}
+
+/* privacy */
+.priv .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px}
+.pcard h3{font:700 18px var(--f);margin:12px 0 6px}
+.pcard p{font-size:15px;color:var(--ink2);line-height:1.55}
+.pcard .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--accT);color:var(--acc)}
+.center{text-align:center}
+.center .copy>p,.center>p{margin:0 auto}
+
+/* faq */
+.faq{max-width:780px;margin:40px auto 0}
+.faq details{border-bottom:1px solid var(--line);padding:20px 0}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:16px;font:600 18px var(--f)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:after{content:"+";font:400 26px/1 var(--f);color:var(--mute);transition:transform .2s}
+.faq details[open] summary:after{transform:rotate(45deg)}
+.faq details p{margin-top:10px;color:var(--ink2);font-size:16px}
+
+/* final cta */
+.final{padding:110px 0 90px}
+.final h2{font-size:clamp(36px,5vw,60px)}
+.final .join{margin:30px auto 0;justify-content:center}
+
+footer{border-top:1px solid var(--line);padding:36px 0 48px;font-size:14px;color:var(--mute)}
+footer .wrap{display:flex;gap:24px;justify-content:space-between;flex-wrap:wrap}
+footer p{max-width:62ch}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(15,23,41,.45);backdrop-filter:blur(6px)}
+.modal.on{display:flex}
+.mbox{background:var(--card);border-radius:28px;max-width:440px;width:100%;padding:30px;box-shadow:0 40px 100px -20px rgba(15,23,41,.5);position:relative;animation:pop .28s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes pop{from{transform:scale(.94);opacity:0}to{transform:none;opacity:1}}
+.mbox .x{position:absolute;right:16px;top:14px;border:0;background:none;font-size:26px;color:var(--mute);cursor:pointer}
+.mbox .place{font:800 56px/1 var(--f);letter-spacing:-.03em;color:var(--acc);margin:6px 0 4px}
+.mbox .ref{display:flex;gap:8px;margin-top:18px}
+.mbox .ref input{flex:1;height:44px;border:1px solid var(--line);border-radius:12px;padding:0 12px;font:500 13.5px var(--f);color:var(--ink2);background:var(--bg)}
+.mbox .ladder{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.mbox .ladder span{font:600 12.5px var(--f);background:var(--bg);border-radius:99px;padding:6px 11px;color:var(--ink2)}
+.err{color:var(--red);font-size:14px;margin-top:10px;min-height:20px}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.app,.btn{transition:none}html{scroll-behavior:auto}}
+
+/* responsive */
+@media (max-width:980px){
+  #day .grid{grid-template-columns:1fr 1fr!important}
+  #for .grid{grid-template-columns:1fr!important}
+  #more .grid{grid-template-columns:1fr 1fr!important}
+  .nav nav{display:none}
+  .nav .btn{margin-left:auto}
+  .hero .wrap,section.f .wrap,.cap .wrap{grid-template-columns:1fr;gap:40px}
+  section.f.rev .copy{order:0}
+  .phones{height:560px;max-width:440px;margin:0 auto;width:100%}
+  .apps .grid{grid-template-columns:1fr 1fr}
+  .priv .grid,#more .grid,#day .grid{grid-template-columns:1fr!important}
+  section.f{padding:72px 0}
+  .cap{margin:0 12px;padding:64px 0;border-radius:28px}
+}
+@media (max-width:560px){
+  body{font-size:16px}
+  .wrap{width:calc(100% - 32px)}
+  .hero{padding:44px 0 20px}
+  .phones{height:470px}
+  .phone{width:230px;border-radius:36px;padding:7px}
+  .phone img{border-radius:30px}
+  .phone.sm{width:200px}
+  .chip{display:none}
+  .apps .grid{grid-template-columns:1fr}
+  .shot{gap:12px}
+  .shot .phone.tilt{display:none}
+  .join .btn{flex:1 1 100%}
+}
+
+.tcc-strip{background:#0c120f;color:#cfd6d1;font:600 12.5px/1 system-ui,-apple-system,'Segoe UI',sans-serif;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 18px;height:38px;position:relative;z-index:50}
+.tcc-strip a{color:#cfd6d1;text-decoration:none;padding:6px 10px;border-radius:99px}
+.tcc-strip a:hover{color:#fff;background:rgba(255,255,255,.08)}
+.tcc-strip a.on{background:#e8eefd;color:#111a2e}
+.tcc-strip .l{font-weight:700;letter-spacing:.02em;white-space:nowrap}
+.tcc-strip .r{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+@media (max-width:560px){.tcc-strip .l{display:none}.tcc-strip{justify-content:center}}
+.batch{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:26px;padding:12px 18px;border-radius:18px;background:var(--card);border:1px solid var(--line);font-size:15px;color:var(--ink2)}
+.batch .full{font-weight:800;color:var(--ink);display:inline-flex;align-items:center;gap:8px}
+.batch .full i{width:9px;height:9px;border-radius:50%;background:#d6453a;display:inline-block}
+.batch .cnt{font-weight:800;color:var(--acc);font-variant-numeric:tabular-nums}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.wform{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:620px;margin:30px auto 0;text-align:left}
+.wform label{display:flex;flex-direction:column;gap:6px;font:700 13px var(--f);color:var(--ink2)}
+.wform label small{font-weight:500;color:var(--mute)}
+.wform input{height:50px;border-radius:14px;border:1px solid var(--line);background:var(--card);padding:0 16px;font:500 16px var(--f);color:var(--ink)}
+.wform input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 4px var(--accT)}
+.wform .full2{grid-column:1/-1}
+.wform .btn{grid-column:1/-1;height:54px}
+input[name=ref]::placeholder{text-transform:none}
+.starnote{grid-column:1/-1;font-size:14px;color:var(--ink2);background:#fff8e6;border:1px solid #f0dca8;border-radius:14px;padding:12px 16px}
+.starnote b{color:#8a6410}
+@media (max-width:560px){.wform{grid-template-columns:1fr}}
+.mbox .star{display:inline-block;font:800 13px var(--f);background:#fff1c9;color:#7a5600;border-radius:99px;padding:5px 12px;margin-bottom:6px}
+.star{color:var(--acc);text-decoration:none;font-weight:800;margin-left:1px}
+.fineprint{grid-column:1/-1;margin-top:6px;padding-top:14px;border-top:1px solid var(--line);font-size:13.5px;color:var(--mute)}
+</style>
+<script src="/js/cc-embed.js" data-site="nexus"></script>
+<script src="/js/cc-api.js"></script>
+<style>.emb,.emb body{background:transparent!important}
+html[data-theme=dark]{--bg:#0a0e18;--bg2:#0f1524;--card:#131a2b;--ink:#eef1f8;--ink2:#b9c2d6;--mute:#8791a8;--line:#222c43;--accT:rgba(123,155,255,.16);--acc:#7b9bff;--goldT:rgba(232,196,106,.14);--greenT:rgba(70,200,130,.14);--violetT:rgba(150,125,255,.16);--shadow:0 1px 2px rgba(0,0,0,.4),0 12px 40px -12px rgba(0,0,0,.6);color-scheme:dark}
+html[data-theme=dark] .starnote{background:rgba(232,196,106,.1);border-color:rgba(232,196,106,.3);color:#e8dcc0}
+html[data-theme=dark] .starnote b{color:#e8c46a}
+html[data-theme=dark] .mbox .star{background:rgba(232,196,106,.18);color:#e8c46a}
+html[data-theme=dark] .batch .cnt,html[data-theme=dark] .btn-p{color:#fff}
+html[data-theme=dark] .btn-p{background:#3d63e0}
+html[data-theme=dark] .btn-g{background:var(--card);color:var(--ink);border-color:var(--line)}
+html[data-theme=dark] .pcard,html[data-theme=dark] .app2,html[data-theme=dark] details,html[data-theme=dark] .chip,html[data-theme=dark] .chipx,html[data-theme=dark] .mbox{background:var(--card)}
+html[data-theme=dark] .chip{color:var(--ink2)}html[data-theme=dark] .chip b{color:var(--ink)}
+html[data-theme=dark] .nav{background:color-mix(in srgb,#0a0e18 82%,transparent)}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="/nexus/"><img src="/nexus/img/mark-sm.png" alt="" width="28" height="30">Nexus<small class="by">by The Capital Code</small></a>
+    <nav aria-label="Sections">
+      <a href="#how">How it works</a><a href="#apps">Apps</a><a href="#capital">Markets</a><a href="#ai">Ask your money</a><a href="#privacy">Privacy</a><a href="#faq">FAQ</a>
+    </nav>
+    <a class="btn btn-p" href="#join">Join the waitlist</a>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow rv"><i></i>Beta batch 1 is full</span>
+      <h1 class="rv">Your money, <em class="s">private on your phone.</em></h1>
+      <p class="lede rv">What you own, what you spend, what is due and what the market is doing, in one private app that is yours alone. Its AI runs on the phone<a class="star" href="#fineprint" aria-label="See the note on phones">★</a>, so your messages are never uploaded. Want your family in? Connect them with one family code.</p>
+      <div class="batch rv"><span class="full"><i></i>Batch 1 filled up. Batch 2 opens soon.</span><span><span class="cnt" data-cnt>1,285</span> people are already in line</span></div>
+      <div class="ctas rv"><a class="btn btn-p" href="#join" style="height:52px">Join the waitlist</a></div>
+      <p class="fine rv">We let people in a batch at a time so the app stays quick and every question gets answered. <b>★ Bring an invite code and you go to the front of the line.</b></p>
+      <div class="trust rv">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>No bank login</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Nothing scraped</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Hindi and English</span>
+      </div>
+    </div>
+    <div class="phones rv" aria-hidden="false">
+      <div class="phone b"><img src="/nexus/img/s-kosh-overview.webp?v=20261123b" alt="Spends: this month's spending against the budget" width="390" height="844" loading="eager"></div>
+      <div class="phone a"><img src="/nexus/img/s-hub.webp?v=20261123b" alt="The Nexus home screen: net worth, dues, spends and messages from every app" width="390" height="844" loading="eager"></div>
+      <div class="chip c1"><b>₹20.26 L net worth</b>Liquid, locked and loans, from what you entered or approved.</div>
+      <div class="chip c2"><b>2 spends to approve</b>Over the limit you set, so they wait for your yes.</div>
+    </div>
+  </div>
+</section>
+
+<section class="apps" id="apps"><div class="wrap"><div class="apps2"><a class="app2 rv" href="#arth" style="--tint:#f6efe0"><div class="ic" style="background:#f6efe0;color:#a8822f"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 3 21h4l5-10 5 10h4z"/></svg></div><h3>Wealth</h3><p>Everything you own and owe, in one net worth.</p><div class="peek"><img src="/nexus/img/s-arth-home.webp?v=20261123b" alt="The Wealth home screen" width="390" height="844" loading="lazy"></div></a><a class="app2 rv" href="#kosh" style="--tint:#e3f4ea"><div class="ic" style="background:#e3f4ea;color:#178a52"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4h12M6 9h12M9 4c5 0 5 10 0 10H6l8 6"/></svg></div><h3>Spends</h3><p>Every spend in one book, approved with a swipe.</p><div class="peek"><img src="/nexus/img/s-kosh-overview.webp?v=20261123b" alt="The Spends overview" width="390" height="844" loading="lazy"></div></a><a class="app2 rv" href="#capital" style="--tint:#e8eefd"><div class="ic" style="background:#e8eefd;color:#2a5ce8"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l5-5 4 4 8-9"/><path d="M14 7h6v6"/></svg></div><h3>Markets</h3><p>Strategy signals on checked NSE data, for paper trading.</p><div class="peek"><img src="/nexus/img/s-cap-signals.webp?v=20261123b" alt="Market signals" width="390" height="844" loading="lazy"></div></a><a class="app2 rv" href="#vaani" style="--tint:#efeafe"><div class="ic" style="background:#efeafe;color:#7a5af0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H9l-5 4z"/></svg></div><h3>Chat</h3><p>The family chat, with money cards and medicine reminders.</p><div class="peek"><img src="/nexus/img/s-vaani-chats.webp?v=20261123b" alt="The family chat" width="390" height="844" loading="lazy"></div></a></div></div></section>
+
+<section class="f priv" id="how">
+  <div class="wrap" style="display:block">
+    <div class="center">
+      <p class="kick" style="color:var(--acc)">How it works</p>
+      <h2 class="rv">Three steps to <em class="s">a clear picture.</em></h2>
+      <p class="rv" style="font-size:18px;color:var(--ink2);max-width:52ch;margin:0 auto">You do not have to type your whole life in on day one.</p>
+    </div>
+    <div class="grid">
+      <div class="pcard rv"><div class="ic" style="font:800 18px var(--f)">1</div><h3>Add what you have</h3><p>Fill one Excel once, or add holdings by hand. Accounts, cards, FDs, funds, shares, loans, income, reminders and goals all have a place.</p></div>
+      <div class="pcard rv"><div class="ic" style="font:800 18px var(--f)">2</div><h3>Approve, don't type</h3><p>Entries arrive as cards and nothing is saved until you say yes. Anything over the limit you set waits for your approval.</p></div>
+      <div class="pcard rv"><div class="ic" style="font:800 18px var(--f)">3</div><h3>Ask, and decide</h3><p>See the net worth, the calendar and the signals, or just ask in plain words and drag the numbers to see what changes.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="f" id="arth">
+  <div class="wrap">
+    <div class="copy">
+      <p class="kick" style="color:var(--gold)">Wealth · net worth</p>
+      <h2 class="rv">A net worth you can <em class="s">actually trust.</em></h2>
+      <p class="rv">Enter each holding once. Wealth keeps the total, fills the calendar with every EMI, SIP, premium and maturity, and shows one short list of what needs you today.</p>
+      <ul class="pts">
+        <li class="rv"><span class="tick" style="background:var(--goldT);color:var(--gold)">✓</span><span><b>Liquid, locked, loans.</b> The split that tells you what you could use in an emergency.</span></li>
+        <li class="rv"><span class="tick" style="background:var(--goldT);color:var(--gold)">✓</span><span><b>Every Indian holding in its own shape.</b> FD and RD, mutual funds, stocks, PPF, EPF, NPS, insurance, gold, property and loans.</span></li>
+        <li class="rv"><span class="tick" style="background:var(--goldT);color:var(--gold)">✓</span><span><b>Mark paid from the alarm.</b> Dues ring the evening before and the morning of, with a Mark paid button.</span></li>
+      </ul>
+    </div>
+    <div class="shot three rv">
+      <div class="phone"><img src="/nexus/img/s-arth-home.webp?v=20261123b" alt="Net worth, money inbox and what is due now" width="390" height="844" loading="lazy"></div>
+      <div class="phone"><img src="/nexus/img/s-arth-wealth.webp?v=20261123b" alt="Holdings by type" width="390" height="844" loading="lazy"></div>
+      <div class="phone"><img src="/nexus/img/s-arth-plan.webp?v=20261123b" alt="Goals, health checks and what-ifs" width="390" height="844" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<section class="f rev band" id="kosh">
+  <div class="wrap">
+    <div class="copy">
+      <p class="kick" style="color:var(--green)">Spends · every rupee</p>
+      <h2 class="rv">Every rupee, <em class="s">in one honest book.</em></h2>
+      <p class="rv">You log your own spends, your budget burns down live, and anything over a limit you set waits for your yes. One month total, the same on every screen. Link a family and the shared totals show up for everyone in it.</p>
+      <ul class="pts">
+        <li class="rv"><span class="tick" style="background:var(--greenT);color:var(--green)">✓</span><span><b>Bank SMS become entries you approve.</b> Read on the phone; the message never leaves it.</span></li>
+        <li class="rv"><span class="tick" style="background:var(--greenT);color:var(--green)">✓</span><span><b>Mine first, shared if I choose.</b> Your ledger is yours. Only what you mark as shared shows, as totals, to your linked family.</span></li>
+        <li class="rv"><span class="tick" style="background:var(--greenT);color:var(--green)">✓</span><span><b>Quick commerce, matched.</b> Blinkit, Instamart and Zepto orders checked against the ledger.</span></li>
+      </ul>
+    </div>
+    <div class="shot three rv">
+      <div class="phone"><img src="/nexus/img/s-kosh-overview.webp?v=20261123b" alt="Spend against budget and approvals waiting" width="390" height="844" loading="lazy"></div>
+      <div class="phone"><img src="/nexus/img/s-kosh-ledger.webp?v=20261123b" alt="The spends ledger" width="390" height="844" loading="lazy"></div>
+      <div class="phone"><img src="/nexus/img/s-kosh-insights.webp?v=20261123b" alt="Spending insights" width="390" height="844" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<div style="padding:96px 0 0" id="capital"></div>
+<section class="cap">
+  <div class="wrap">
+    <div class="copy">
+      <p class="kick">Markets · market signals</p>
+      <h2 class="rv">See the setup, <em class="s">not just the signal.</em></h2>
+      <p class="rv">Pick the strategies you want to follow. Every evening Nexus checks the day's NSE files and lists the stocks that meet their rules. Tap one and the chart shows why.</p>
+      <ul class="pts">
+        <li class="rv"><span class="tick" style="background:#26314d;color:#e3c27a">✓</span><span><b>The strategy drawn on the chart.</b> Its EMAs, RSI and levels on real candles, the signal candle marked, Day, Week or Month.</span></li>
+        <li class="rv"><span class="tick" style="background:#26314d;color:#e3c27a">✓</span><span><b>The rules checked again.</b> Each rule with the actual numbers on the signal day.</span></li>
+        <li class="rv"><span class="tick" style="background:#26314d;color:#e3c27a">✓</span><span><b>Your own marks.</b> Add or hide indicators, draw Fib levels, channels and boxes; they are saved per stock.</span></li>
+        <li class="rv"><span class="tick" style="background:#26314d;color:#e3c27a">✓</span><span><b>Data that is checked, not guessed.</b> Each file is cross-checked against NSE's other files before a day is published, and splits apply only when the price gap confirms them.</span></li>
+      </ul>
+      <div class="stat rv">
+        <div><b>5 years</b>of NSE history on the phone</div>
+        <div><b>748</b>stocks scanned</div>
+        <div><b>10</b>ready strategies, or write your own</div>
+      </div>
+      <p class="note rv">Markets is for learning with paper trades. It is not investment advice, and Nexus is not a SEBI-registered adviser.</p>
+    </div>
+    <div class="shot three rv">
+      <div class="phone"><img src="/nexus/img/s-cap-signals.webp?v=20261123b" alt="Signals from the strategies you follow" width="390" height="844" loading="lazy"></div>
+      <div class="phone"><img src="/nexus/img/s-cap-chart.webp?v=20261123b" alt="A signal drawn on the chart with its strategy lines" width="390" height="844" loading="lazy"></div>
+      <div class="phone"><img src="/nexus/img/s-cap-rules.webp?v=20261123b" alt="The strategy rules checked again on the signal day" width="390" height="844" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<section class="f" id="vaani">
+  <div class="wrap">
+    <div class="copy">
+      <p class="kick" style="color:var(--violet)">Family, on your terms</p>
+      <h2 class="rv">Your own Nexus. <em class="s">One code links your family.</em></h2>
+      <p class="rv">Everyone in the house has their own Nexus, with their own private money. When you want to share, one person creates a family and gets a unique family code. Everyone else joins with that code. Nothing is shared until each person chooses to share it.</p>
+      <ul class="pts">
+        <li class="rv"><span class="tick" style="background:var(--violetT);color:var(--violet)">✓</span><span><b>One unique family code.</b> Create a family, share the code, and each person joins from their own phone. Leave any time.</span></li>
+        <li class="rv"><span class="tick" style="background:var(--violetT);color:var(--violet)">✓</span><span><b>Money cards in the chat.</b> Share a spend or a due; tap it and the right app opens.</span></li>
+        <li class="rv"><span class="tick" style="background:var(--violetT);color:var(--violet)">✓</span><span><b>Family Care.</b> Medicine times ring on the phone with a Mark all given button.</span></li>
+        <li class="rv"><span class="tick" style="background:var(--violetT);color:var(--violet)">✓</span><span><b>Places, for safety.</b> Arrivals at home or school post to your family; each person chooses continuous, balanced or off for themselves.</span></li>
+      </ul>
+    </div>
+    <div class="shot three rv">
+      <div class="phone"><img src="/nexus/img/s-vaani-chats.webp?v=20261123b" alt="The family chat, expense cards and doses due" width="390" height="844" loading="lazy"></div>
+      <div class="phone"><img src="/nexus/img/s-vaani-care.webp?v=20261123b" alt="Family Care reminders" width="390" height="844" loading="lazy"></div>
+      <div class="phone"><img src="/nexus/img/s-hub-family.webp?v=20261123b" alt="Members, family code and shared totals" width="390" height="844" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<section class="f rev band" id="ai">
+  <div class="wrap" style="display:block;padding-bottom:56px">
+    <h2 class="usp-line rv">Your money. <span>On-device AI.</span><a class="star" href="#fineprint" aria-label="See the note on phones" style="font-size:.4em;vertical-align:super">★</a> Linked to family by one code.</h2>
+  </div>
+  <div class="wrap">
+    <div class="copy">
+      <p class="kick" style="color:var(--acc)">Ask your money · on the phone</p>
+      <h2 class="rv">Ask in plain words. <em class="s">Get an answer you can check.</em></h2>
+      <p class="rv">"Can I afford a bigger EMI?" "What did I spend on groceries?" "How long to clear my car loan?" The assistant looks at your own entries, works the numbers out exactly, and shows them as a chart you can drag.</p>
+      <ul class="pts">
+        <li class="rv"><span class="tick" style="background:var(--accT);color:var(--acc)">✓</span><span><b>Drag to try it.</b> What-if sliders change the EMI, the SIP or the rate, and the answer moves with them.</span></li>
+        <li class="rv"><span class="tick" style="background:var(--accT);color:var(--acc)">✓</span><span><b>Numbers come from your records.</b> The maths is done by exact code, not guessed, and every figure in the reply is checked against it.</span></li>
+        <li class="rv"><span class="tick" style="background:var(--accT);color:var(--acc)">✓</span><span><b>Open any chart in full.</b> One tap shows the data and the assumptions behind it.</span></li>
+        <li class="rv"><span class="tick" style="background:var(--accT);color:var(--acc)">✓</span><span><b>It notices first.</b> A budget running hot, a cluster of big dues next week, a daily brief at the time you choose.</span></li>
+      </ul>
+    </div>
+    <div class="shot three rv">
+      <div class="phone"><img src="/nexus/img/s-chat-1.webp?v=20261123b" alt="Ask: where did my money go last month? The answer is a donut of spending by category" width="390" height="844" loading="lazy"></div>
+      <div class="phone"><img src="/nexus/img/s-chat-2.webp?v=20261123b" alt="Ask: EMI for 50 lakh at 8.5% for 20 years. The answer has sliders for amount, rate and tenure" width="390" height="844" loading="lazy"></div>
+      <div class="phone"><img src="/nexus/img/s-chat-3.webp?v=20261123b" alt="Ask: can I afford a 60,000 phone? The answer is a price slider against cash after card dues" width="390" height="844" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<section class="f" id="more">
+  <div class="wrap" style="display:block">
+    <div class="center">
+      <p class="kick" style="color:var(--acc)">And more</p>
+      <h2 class="rv">Small things that <em class="s">add up.</em></h2>
+    </div>
+    <div class="shot rv" style="margin:36px 0 0;gap:28px">
+      <div class="phone sm"><img src="/nexus/img/s-hub-intel.webp?v=20261123b" alt="Intelligence: what the app noticed first" width="390" height="844" loading="lazy"></div>
+      <div class="phone sm tilt"><img src="/nexus/img/s-hub-calendar.webp?v=20261123b" alt="One calendar for every EMI, SIP, premium and maturity" width="390" height="844" loading="lazy"></div>
+    </div>
+    <div class="grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:70px">
+      <div class="pcard rv"><h3>Every due, in one calendar</h3><p>EMIs, SIPs, premiums, maturities and renewals, with an alarm the evening before and a Mark paid button.</p></div>
+      <div class="pcard rv"><h3>Fix a balance from a statement</h3><p>Upload a bank statement and the balance is set only if every row adds up to the bank's own figures. If not, nothing changes and you see which rows to check.</p></div>
+      <div class="pcard rv"><h3>Bring your data in one go</h3><p>One Excel for accounts, cards, FDs, funds, shares, loans, income, reminders and goals. Mistakes show the sheet, the cell and what to change.</p></div>
+      <div class="pcard rv"><h3>A morning brief</h3><p>Month spend, tomorrow's dues and what the app noticed, at the time you choose.</p></div>
+      <div class="pcard rv"><h3>Approvals that stay civil</h3><p>Spends over your limit wait for your yes. Shared items show totals; private ones stay private.</p></div>
+      <div class="pcard rv"><h3>Money health checks</h3><p>Life cover, nominees, tax saving (80C), emergency fund and debt payoff, each with a clear status and a next step.</p></div>
+      <div class="pcard rv"><h3>Credit cards, tracked</h3><p>Outstanding against the limit, with bill and due days, and a Pay bill button when it is due.</p></div>
+      <div class="pcard rv"><h3>Quick-commerce check</h3><p>Blinkit, Instamart and Zepto orders are checked against the ledger, and odd ones are flagged.</p></div>
+      <div class="pcard rv"><h3>Shared to-dos</h3><p>Once you link a family, lists everyone in it can see. Tick an item and everyone sees it.</p></div>
+      <div class="pcard rv"><h3>Shared files</h3><p>Photos and files shared in your family chats, kept together in one place.</p></div>
+      <div class="pcard rv"><h3>Strategy lab</h3><p>Backtest a strategy on five years of data, copy and edit a ready one, or upload your own.</p></div>
+      <div class="pcard rv"><h3>Market analysis</h3><p>Indices, breadth, sectors, F&O and a stock screener, on the same checked data.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="f band" id="day">
+  <div class="wrap" style="display:block">
+    <div class="center">
+      <p class="kick" style="color:var(--acc)">A day with Nexus</p>
+      <h2 class="rv">It does the remembering, <em class="s">you do the deciding.</em></h2>
+    </div>
+    <div class="grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px">
+      <div class="pcard rv"><p class="kick" style="margin:0 0 6px;color:var(--acc)">Morning</p><h3>The brief</h3><p>Month spend, what is due today and tomorrow, and what the app noticed, at the time you choose.</p></div>
+      <div class="pcard rv"><p class="kick" style="margin:0 0 6px;color:var(--acc)">Through the day</p><h3>Cards to approve</h3><p>New spends arrive as cards. Swipe yes, fix a detail, or skip.</p></div>
+      <div class="pcard rv"><p class="kick" style="margin:0 0 6px;color:var(--acc)">Evening</p><h3>Dues and signals</h3><p>An alarm the evening before a due, with a Mark paid button, and the evening market scan if you follow strategies.</p></div>
+      <div class="pcard rv"><p class="kick" style="margin:0 0 6px;color:var(--acc)">Any time</p><h3>Ask your money</h3><p>"Can we afford this?" The assistant works it out from your own entries and shows its working.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="f" id="for">
+  <div class="wrap" style="display:block">
+    <div class="center">
+      <p class="kick" style="color:var(--acc)">Built for Indian money</p>
+      <h2 class="rv">Your holdings, <em class="s">in their own shape.</em></h2>
+      <p class="rv" style="font-size:18px;color:var(--ink2);max-width:56ch;margin:0 auto">Not a generic ledger. Each kind of holding asks for what it really has.</p>
+    </div>
+    <div class="rv" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:34px auto 0;max-width:900px">
+      <span class="chipx">FD and RD</span><span class="chipx">Mutual funds and SIPs</span><span class="chipx">Shares</span><span class="chipx">Gold, SGB and gold ETFs</span><span class="chipx">PPF</span><span class="chipx">EPF</span><span class="chipx">NPS</span><span class="chipx">Insurance and premiums</span><span class="chipx">Bonds</span><span class="chipx">Kisan Vikas Patra</span><span class="chipx">Property</span><span class="chipx">Vehicles and loans</span><span class="chipx">HUF and business</span><span class="chipx">Collectables</span><span class="chipx">EMIs and credit cards</span><span class="chipx">Rupees in lakh and crore</span><span class="chipx">Hindi and English</span>
+    </div>
+    <div class="grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px">
+      <div class="pcard rv"><h3>Joint holdings</h3><p>Shared items show totals to your linked family; each person's own ledger stays theirs. A joint holding is entered once, so it is never counted twice.</p></div>
+      <div class="pcard rv"><h3>Parents and medicines</h3><p>Dose times ring on the phone, and anyone in your linked family can mark a dose given, so the next person knows.</p></div>
+      <div class="pcard rv"><h3>Learning the market</h3><p>Follow strategies on checked end-of-day data, see the rules on the chart, and paper trade. No orders are ever placed.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="f priv" id="privacy">
+  <div class="wrap" style="display:block">
+    <div class="center">
+      <p class="kick" style="color:var(--acc)">Privacy</p>
+      <h2 class="rv">A vault, <em class="s">not a data pipe.</em></h2>
+      <p class="rv" style="font-size:18px;color:var(--ink2);max-width:52ch">The less we hold, the less anyone can lose. Here is what stays on your phone and what syncs.</p>
+    </div>
+    <div class="grid">
+      <div class="pcard rv"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></div><h3>SMS stay on the phone</h3><p>Bank messages are read by the on-device reader. They are not uploaded and not sent to any AI.</p></div>
+      <div class="pcard rv"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div><h3>Private by default</h3><p>Every record belongs to one person, and database rules let only that person read it.</p></div>
+      <div class="pcard rv"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 20c0-2.2 1.3-4 4-4"/></svg></div><h3>Family sees only what you share</h3><p>Mark something shared and your linked family can see it. They cannot change it.</p></div>
+      <div class="pcard rv"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h10M4 17h7"/></svg></div><h3>Masked before any cloud AI</h3><p>Names, account numbers and FD numbers are masked on the phone before a cloud AI call.</p></div>
+      <div class="pcard rv"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div><h3>No bank connection</h3><p>Nexus never logs in to your bank. Everything comes from what you enter, approve or receive by SMS.</p></div>
+      <div class="pcard rv"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div><h3>Sync that cannot wipe you</h3><p>Deletes sync as markers, so an empty cloud can never erase what is on your phone.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="f band" id="faq" style="padding-top:88px">
+  <div class="wrap" style="display:block">
+    <div class="center"><p class="kick" style="color:var(--acc)">Questions</p><h2 class="rv">Before you join</h2></div>
+    <div class="faq">
+      <details><summary>Does Nexus connect to my bank account?</summary><p>No. It reads the bank SMS on your phone and what you enter or approve. There is no bank login, no account aggregator and no scraping.</p></details>
+      <details><summary>Who can see my money?</summary><p>Only you. If you link a family, only the items you mark as shared show, as totals. Ledgers and line items stay yours.</p></details>
+      <details><summary>How does the family link work?</summary><p>Every person has their own Nexus account. One person creates a family and gets a unique family code; the others enter it on their own phone to join. You can leave a family whenever you like and your own data stays yours.</p></details>
+      <details><summary>Are the market signals investment advice?</summary><p>No. It shows signals from strategies you choose on end-of-day NSE data, for paper trading and learning. Nexus is not a SEBI-registered adviser and places no orders.</p></details>
+      <details><summary>Does it work without the internet?</summary><p>Mostly. Your data, the AI and five years of market history live on the phone. New market days and family sync arrive when you are online.</p></details>
+      <details><summary>Which phones?</summary><p>Android first. The web version runs in any modern browser.</p></details>
+      <details><summary>What does it cost?</summary><p>Free for everyone in the beta batches.</p></details>
+      <details><summary>Why a waitlist, and what is the star?</summary><p>Batch 1 is full. We open Nexus in small batches so we can fix things fast and answer everyone. People who join with an invite code are marked with a star and are let in ahead of the open queue.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="f band" id="tcc">
+  <div class="wrap" style="display:block">
+    <div class="center">
+      <p class="kick" style="color:var(--acc)">From The Capital Code</p>
+      <h2 class="rv">Made by people who <em class="s">explain money for a living.</em></h2>
+      <p class="rv" style="font-size:18px;color:var(--ink2);max-width:58ch;margin:0 auto">On The Capital Code we take Indian money apart on camera: what happens to your own rupees, how markets really behave, how the system underneath keeps running. Nexus is that habit in your pocket. Every figure can be checked, and the working is always on screen.</p>
+    </div>
+  </div>
+</section>
+
+<section class="final center" id="join">
+  <div class="wrap">
+    <p class="kick" style="color:var(--acc)">Batch 1 is full</p>
+    <h2 class="rv">Batch 2 is next. <em class="s">Get in line.</em></h2>
+    <p class="rv" style="font-size:18px;color:var(--ink2);max-width:52ch;margin:0 auto">We open Nexus a batch at a time, so the app stays quick and nobody is left stuck. Your spot in line is saved the moment you join.</p>
+    <p class="rv" style="margin-top:18px;font-size:16px;color:var(--ink2)"><b class="cnt" data-cnt style="color:var(--acc)">1,285</b> people are already waiting. Seats in Batch 2 are limited.</p>
+    <form class="wform rv" data-join novalidate>
+      <label>Name<input name="name" type="text" placeholder="Your full name" autocomplete="name" required></label>
+      <label>Mobile number<input name="mobile" type="tel" inputmode="numeric" placeholder="98765 43210" autocomplete="tel" required></label>
+      <label class="full2">Email<input name="email" type="email" placeholder="you@example.com" autocomplete="email" required></label>
+      <label class="full2">Invite code <small>(optional)</small><input name="ref" type="text" placeholder="Have a code? Enter it for ★ priority" autocomplete="off" maxlength="12" style="text-transform:uppercase"></label>
+      <p class="starnote"><b>★ Priority line.</b> People who join with an invite code are let in before the open queue. Join, then share your own code: each friend who joins with it moves you up 50 places.</p>
+      <button class="btn btn-p" type="submit">Join the waitlist</button>
+    </form>
+    <p class="err" data-err role="alert"></p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><a class="brand" href="/nexus/"><img src="/nexus/img/mark-sm.png" alt="" width="22" height="24">Nexus<small class="by">by The Capital Code</small></a></div>
+    <p>Nexus is a private app for your own money: wealth, spends and signals, with an optional family link and chat. Markets shows paper-trading signals for learning; it is not investment advice and Nexus is not a SEBI-registered adviser. Nexus never connects to your bank account. Screens shown use sample data, and the app names on them are placeholders.</p>
+    <p id="fineprint" class="fineprint"><b>★ A word about older phones.</b> The AI runs on your phone, not on our servers, so it needs free storage and memory to work. On an older or low-memory phone it can answer more slowly and use more battery. Newer phones handle it far more comfortably.</p>
+  </div>
+</footer>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mt">
+  <div class="mbox">
+    <button class="x" type="button" aria-label="Close" data-close>×</button>
+    <p class="kick" style="color:var(--acc)" id="mt">You're in line for Batch 2</p>
+    <span class="star" data-star hidden>★ Priority line</span>
+    <div class="place" data-place>#—</div>
+    <p style="color:var(--ink2);font-size:15px">Each friend who joins with your link moves you up 50 places.</p>
+    <div class="ladder"><span>1 friend: −50</span><span>3 friends: −150</span><span>10 friends: −500</span></div>
+    <div class="ref"><input readonly data-ref aria-label="Your invite link"><button class="btn btn-g" type="button" data-copy style="height:44px">Copy</button></div>
+    <a class="btn btn-p" data-wa target="_blank" rel="noopener" style="width:100%;margin-top:12px">Share on WhatsApp</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  // waitlist: Supabase functions join_waitlist / waitlist_count (same project as the earlier site)
+  var BASE = 1285;                         // queue already waiting when Batch 2 opened
+  var TICK_FROM = Date.UTC(2026, 10, 24);  // 24 Nov 2026
+  var TICK_EVERY = 47 * 60 * 1000;         // one more every 47 minutes, same number for everyone
+  var urlRef = (new URLSearchParams(location.search).get('ref') || '').toUpperCase().slice(0, 12);
+  var errEl = document.querySelector('[data-err]');
+  var real = 0, joinedHere = 0;
+  function paint() {
+    var ticks = Math.max(0, Math.floor((Date.now() - TICK_FROM) / TICK_EVERY));
+    var n = BASE + real + ticks + joinedHere;
+    document.querySelectorAll('[data-cnt]').forEach(function (el) { el.textContent = n.toLocaleString('en-IN'); });
+  }
+  paint(); setInterval(paint, 60000);
+  CCApi.count('nexus').then(function (n) { if (typeof n === 'number' && n > 0) { real = n; paint(); } }).catch(function () {});
+
+  var refInput = document.querySelector('input[name=ref]');
+  if (refInput && urlRef) refInput.value = urlRef;
+  function link(code) { return location.origin + '/nexus/?ref=' + encodeURIComponent(code); }
+  function show(res, starred) {
+    var m = document.getElementById('modal');
+    var place = res && res.place ? (BASE + Number(res.place)) : null;
+    var pe = document.querySelector('[data-place]');
+    pe.textContent = starred ? '★ Front of the line' : (place ? '#' + place.toLocaleString('en-IN') : '#—');
+    document.querySelector('[data-star]').hidden = !starred;
+    var url = res && res.code ? link(res.code) : location.origin + '/nexus/';
+    document.querySelector('[data-ref]').value = url;
+    document.querySelector('[data-wa]').href = 'https://wa.me/?text=' + encodeURIComponent("I'm in line for Nexus, a private money app with the AI on your phone. Batch 1 is full. Join the next batch with my invite link for priority: " + url);
+    m.classList.add('on');
+  }
+  function mobileOk(v) { v = v.replace(/[\s\-()]/g, '').replace(/^(\+91|0091|91|0)/, ''); return /^[6-9]\d{9}$/.test(v) ? v : null; }
+  document.querySelectorAll('[data-join]').forEach(function (f) {
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var name = f.name.value.trim(), email = f.email.value.trim(), mobile = mobileOk(f.mobile.value.trim());
+      var code = (f.ref.value || '').trim().toUpperCase().slice(0, 12) || null;
+      var btn = f.querySelector('button[type=submit]');
+      if (name.length < 2) { errEl.textContent = 'Please enter your name.'; return; }
+      if (!mobile) { errEl.textContent = 'Please enter a valid 10-digit mobile number.'; return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Please enter a valid email.'; return; }
+      btn.disabled = true; var t = btn.textContent; btn.textContent = 'Joining…'; errEl.textContent = '';
+      CCApi.join({ product: 'nexus', name: name, email: email, mobile: mobile, ref: code }).then(function (r) { var a = r; joinedHere = 1; paint(); show(a || {}, a && a.priority !== undefined ? !!a.priority : !!code); f.reset(); })
+        .catch(function () { errEl.textContent = 'Could not join right now. Please try again in a minute.'; })
+        .then(function () { btn.disabled = false; btn.textContent = t; });
+    });
+  });
+  document.querySelector('[data-close]').addEventListener('click', function () { document.getElementById('modal').classList.remove('on'); });
+  document.getElementById('modal').addEventListener('click', function (e) { if (e.target.id === 'modal') e.currentTarget.classList.remove('on'); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') document.getElementById('modal').classList.remove('on'); });
+  document.querySelector('[data-copy]').addEventListener('click', function (e) {
+    var v = document.querySelector('[data-ref]').value;
+    (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(function () { e.target.textContent = 'Copied'; }, function () { document.querySelector('[data-ref]').select(); });
+  });
+  var nav = document.getElementById('nav');
+  addEventListener('scroll', function () { nav.classList.toggle('scrolled', scrollY > 8); }, { passive: true });
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } }); }, { rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.rv').forEach(function (el) { io.observe(el); });
+  } else document.querySelectorAll('.rv').forEach(function (el) { el.classList.add('in'); });
+})();
+</script>
+</body>
+</html>

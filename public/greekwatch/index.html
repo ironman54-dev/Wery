@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GreekWatch by The Capital Code: see which side the market is writing</title>
+<meta name="description" content="A live options-Greeks decay tracker for NIFTY, BANKNIFTY, SENSEX and FINNIFTY. See which side, calls or puts, is being written, with the working shown. Open the app or join the list for new features.">
+<meta property="og:title" content="GreekWatch by The Capital Code">
+<meta property="og:description" content="Live options-Greeks decay across four indices, with every reading traced to a formula.">
+<link rel="icon" href="/greekwatch/img/icon-192.png">
+<script src="/js/cc-embed.js" data-site="greekwatch"></script>
+<script src="/js/cc-api.js"></script>
+<style>
+@font-face{font-family:"Inter Tight";src:url(/codeflow/fonts/InterTight-normal-latin.woff2) format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:Fraunces;src:url(/codeflow/fonts/Fraunces-normal-latin.woff2) format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"JetBrains Mono";src:url(/codeflow/fonts/JetBrainsMono-normal-latin.woff2) format("woff2");font-weight:100 800;font-display:swap}
+:root{
+  --bg:#fbf8f3; --band:#f4eee4; --card:#ffffff; --ink:#1c150b; --ink2:#52463a; --mute:#8a7d6e; --line:#e8dfd0;
+  --acc:#d9822b; --acc2:#b66a1d; --accT:#fbe9d2; --accInk:#ffffff; --green:#12926a; --red:#d4455a;
+  --r:22px; --shadow:0 1px 2px rgba(60,40,10,.06),0 18px 50px -18px rgba(60,40,10,.28);
+  --f:"Inter Tight",system-ui,sans-serif; --h:Fraunces,Georgia,serif; --m:"JetBrains Mono",monospace;
+}
+html[data-theme=dark]{--bg:#0d0b08; --band:#14110c; --card:#171310; --ink:#f5efe6; --ink2:#c2b7a8; --mute:#8d8173; --line:#2a241b; --acc:#e8a33d; --acc2:#c98a2c; --accT:rgba(232,163,61,.14); --accInk:#1a1206; --shadow:0 1px 2px rgba(0,0,0,.5),0 18px 50px -18px rgba(0,0,0,.8);color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font:400 17px/1.6 var(--f);color:var(--ink);background:var(--bg);overflow-x:hidden}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(1160px,100% - 40px);margin:0 auto}
+:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:6px}
+h1,h2,h3{font-family:var(--h);font-weight:560;letter-spacing:-.025em}
+.nav{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid transparent;transition:border-color .2s}
+.nav.scrolled{border-bottom-color:var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:26px;height:68px}
+.brand{display:flex;align-items:center;gap:10px;font:600 22px var(--h);letter-spacing:-.02em}
+.brand svg{flex:none}
+.brand small{font:500 11px var(--m);color:var(--mute);letter-spacing:.06em;text-transform:uppercase;margin-left:4px}
+.nav nav{display:flex;gap:22px;margin-left:auto;font:500 15px var(--f);color:var(--ink2)}
+.nav nav a:hover{color:var(--ink)}
+.btn{appearance:none;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 26px;border-radius:99px;font:600 15px var(--f);background:var(--acc);color:var(--accInk);box-shadow:0 12px 30px -10px color-mix(in srgb,var(--acc) 70%,transparent);transition:transform .15s,filter .2s;white-space:nowrap}
+.btn:hover{filter:brightness(1.07)}.btn:active{transform:scale(.97)}
+.btn-sm{height:40px;padding:0 18px;font-size:14px}
+.btn-o{background:transparent;color:var(--ink);box-shadow:none;border:1px solid var(--line)}
+.btn[disabled]{opacity:.6}
+.hero{position:relative;padding:64px 0 40px;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:1fr 1.05fr;gap:40px;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font:600 11.5px var(--m);letter-spacing:.07em;text-transform:uppercase;color:var(--acc2);background:var(--accT);padding:8px 14px;border-radius:99px}
+.eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 4px color-mix(in srgb,var(--acc) 25%,transparent);animation:pulse 2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 8px transparent}}
+h1{font-size:clamp(42px,5.4vw,72px);line-height:1.03;margin:22px 0}
+h1 em,h2 em{font-style:italic;color:var(--acc)}
+.lede{font-size:clamp(18px,1.6vw,21px);color:var(--ink2);max-width:34ch}
+.ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.chips span{font:500 13px var(--f);color:var(--ink2);border:1px solid var(--line);background:var(--card);padding:7px 14px;border-radius:99px}
+.radar{position:absolute;right:-8%;top:50%;width:min(720px,70vw);aspect-ratio:1;transform:translateY(-50%);z-index:-1;border-radius:50%;opacity:.55;
+  background:repeating-radial-gradient(circle,transparent 0 58px,color-mix(in srgb,var(--acc) 22%,transparent) 59px 60px),conic-gradient(from 0deg,transparent 0 78%,color-mix(in srgb,var(--acc) 30%,transparent) 100%);
+  animation:sweep 9s linear infinite;mask-image:radial-gradient(circle,#000 50%,transparent 72%);-webkit-mask-image:radial-gradient(circle,#000 50%,transparent 72%)}
+@keyframes sweep{to{transform:translateY(-50%) rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.radar,.eyebrow i{animation:none}}
+.frame{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#0e1117;box-shadow:var(--shadow)}
+.frame img{width:100%}
+.chip{position:absolute;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font:500 13px/1.35 var(--f);color:var(--ink2);box-shadow:var(--shadow)}
+.chip b{display:block;color:var(--ink);font-weight:700}
+.stage{position:relative}.stage .c1{left:-18px;bottom:-22px}
+.sec{padding:84px 0}
+.band{background:var(--band)}
+.center{text-align:center}
+.kick{font:600 12px var(--m);letter-spacing:.08em;text-transform:uppercase;color:var(--acc2)}
+h2{font-size:clamp(32px,4vw,52px);line-height:1.06;margin:12px 0 14px}
+.sub{font-size:18px;color:var(--ink2);max-width:56ch}.center .sub{margin:0 auto}
+.split{display:grid;grid-template-columns:.9fr 1.1fr;gap:48px;align-items:center}
+.split.rev{grid-template-columns:1.1fr .9fr}.split.rev .copy{order:2}
+ul.pts{list-style:none;margin-top:22px;display:grid;gap:14px}
+ul.pts li{display:flex;gap:12px;font-size:16.5px;color:var(--ink2)}
+ul.pts li b{color:var(--ink)}
+.tick{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accT);color:var(--acc2);display:grid;place-items:center;font-size:13px;font-weight:800;margin-top:2px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px}
+.card h3{font:600 20px var(--h);margin-bottom:8px}.card p{font-size:15.5px;color:var(--ink2)}
+.card .n{font:700 13px var(--m);color:var(--acc2);margin-bottom:10px}
+.faq{max-width:760px;margin:30px auto 0;display:grid;gap:10px}
+details{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 22px}
+summary{cursor:pointer;font:600 17px var(--f);list-style:none}summary::-webkit-details-marker{display:none}
+details p{margin-top:10px;color:var(--ink2);font-size:16px}
+.final{padding:90px 0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:36px;padding:56px 28px;text-align:center;box-shadow:var(--shadow)}
+.panel h2{margin-top:0}
+.join{display:grid;gap:10px;max-width:520px;margin:28px auto 0;text-align:left}
+.join input,.join textarea{width:100%;height:50px;border-radius:99px;border:1px solid var(--line);background:var(--bg);padding:0 22px;font:500 16px var(--f);color:var(--ink)}
+.join textarea{height:78px;border-radius:18px;padding:14px 20px;resize:vertical}
+.join input:focus,.join textarea:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 4px var(--accT)}
+.msg{min-height:1.4em;font:500 14px var(--f);color:var(--acc2);text-align:center}.msg.err{color:var(--red)}
+.join.done input,.join.done textarea,.join.done .btn{display:none}
+.foot{padding:36px 0 46px;border-top:1px solid var(--line);font-size:13.5px;color:var(--mute)}
+.foot .wrap{display:grid;gap:12px}
+.foot a{border-bottom:1px solid var(--line)}
+.emb,.emb body{background:transparent!important}
+.emb .band{background:color-mix(in srgb,var(--band) 55%,transparent)}
+.phones{display:flex;gap:18px;justify-content:center;align-items:flex-start}
+.phone{width:min(250px,46%);border-radius:30px;border:6px solid #07090d;background:#07090d;overflow:hidden;box-shadow:var(--shadow)}
+.phone img{width:100%}.phone:nth-child(2){margin-top:46px}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:36px}
+.tag{display:inline-block;font:600 11.5px var(--m);letter-spacing:.05em;text-transform:uppercase;color:var(--acc2);background:var(--accT);border-radius:99px;padding:5px 11px;margin-bottom:12px}
+.ico{width:42px;height:42px;border-radius:12px;background:var(--accT);color:var(--acc2);display:grid;place-items:center;margin-bottom:14px}
+@media (max-width:900px){.mini{grid-template-columns:1fr}.phone:nth-child(2){margin-top:30px}}
+.rv{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}.rv.in{opacity:1;transform:none}
+@media (max-width:900px){.hero .wrap,.split,.split.rev{grid-template-columns:1fr}.split.rev .copy{order:0}.grid3{grid-template-columns:1fr}.nav nav{display:none}.nav .btn{margin-left:auto}.stage .c1{display:none}.radar{right:-40%}}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="GreekWatch">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 5h22v5H12.5L25 27h-6.4L8 12v15H5z" fill="var(--acc)"/></svg>
+      GreekWatch<small>by The Capital Code</small>
+    </a>
+    <nav aria-label="Sections"><a href="#read">The read</a><a href="#trend">Trend</a><a href="#replay">Time Machine</a><a href="#blast">Blast</a><a href="#faq">FAQ</a></nav>
+    <a class="btn btn-sm" href="https://greekwatchv2.vercel.app" target="_blank" rel="noopener">Open the app</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="radar" aria-hidden="true"></div>
+    <div class="wrap">
+      <div>
+        <p class="eyebrow rv"><i></i>Live · NSE and BSE options · 09:15 to 15:30 IST</p>
+        <h1 class="rv">See which side the market is <em>writing.</em></h1>
+        <p class="lede rv">GreekWatch watches how the Greeks of every strike change through the session, and tells you whether calls or puts are being written, with the working one tap away.</p>
+        <div class="ctas rv">
+          <a class="btn" href="https://greekwatchv2.vercel.app" target="_blank" rel="noopener" style="height:54px">Open the app <span aria-hidden="true">→</span></a>
+          <a class="btn btn-o" href="#join" style="height:54px">Get new features first</a>
+        </div>
+        <div class="chips rv"><span>NIFTY</span><span>BANKNIFTY</span><span>SENSEX</span><span>FINNIFTY</span></div>
+      </div>
+      <div class="stage rv">
+        <div class="frame"><img src="/greekwatch/img/pulse-sentiment.png" alt="GreekWatch Pulse: VIX regime, index alignment and a Bullish, Bearish or Sideways read for vega, theta and OI on each index" width="1592" height="580" fetchpriority="high"></div>
+        <div class="chip c1"><b>Vega 50 · Theta 30 · OI 20</b>One weighted read per index</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="read">
+    <div class="wrap split">
+      <div class="copy">
+        <p class="kick">The read</p>
+        <h2 class="rv">The side decaying faster is <em>the side being written.</em></h2>
+        <p class="sub rv">Writers want premium to fall. So when one side's Greeks decay faster than the other's since the open, that side is being sold into, and that points somewhere. GreekWatch measures it per strike, per side, all day.</p>
+        <ul class="pts">
+          <li class="rv"><span class="tick">✓</span><span><b>One formula, always.</b> Each change is open minus current, summed across strikes inside a stated delta band. Nothing is a mystery score.</span></li>
+          <li class="rv"><span class="tick">✓</span><span><b>Vega, theta and OI, weighted.</b> 50, 30 and 20. When vega and theta disagree, it says No Trade instead of averaging them.</span></li>
+          <li class="rv"><span class="tick">✓</span><span><b>Four indices cross-checked.</b> A call counts for more when the other indices agree, and VIX is read as both a level and a trend since the open.</span></li>
+        </ul>
+      </div>
+      <div class="rv"><div class="frame"><img src="/greekwatch/img/pulse-sentiment.png" alt="The Pulse table for BANKNIFTY, FINNIFTY and NIFTY" width="1592" height="580" loading="lazy"></div></div>
+    </div>
+  </section>
+
+  <section class="sec band" id="trend">
+    <div class="wrap split rev">
+      <div class="rv"><div class="frame"><img src="/greekwatch/img/trend.png" alt="Trend chart: CE and PE theta difference through the day against spot, with decay pressure below" width="1273" height="1150" loading="lazy"></div></div>
+      <div class="copy">
+        <p class="kick">Trend</p>
+        <h2 class="rv">Watch it build, <em>minute by minute.</em></h2>
+        <p class="sub rv">Every minute of the session is recorded, so the day is a line you can read, not a number that flickers. Theta, vega, gamma and OI each get a chart against spot, with decay pressure underneath.</p>
+        <ul class="pts">
+          <li class="rv"><span class="tick">✓</span><span><b>Every chart says how to read it.</b> The rule sits right under the chart, in plain words.</span></li>
+          <li class="rv"><span class="tick">✓</span><span><b>Time Machine.</b> Replay a past session and see exactly what the screen would have said at any minute.</span></li>
+          <li class="rv"><span class="tick">✓</span><span><b>Export.</b> Take the session out as a file when you want to study it elsewhere.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="replay">
+    <div class="wrap split">
+      <div class="copy">
+        <p class="kick">Time Machine</p>
+        <h2 class="rv">Rewind any session, <em>one minute at a time.</em></h2>
+        <p class="sub rv">Pick a recorded day and the whole app travels back to it. Scrub to 12:09, step a frame forward, or let it play at four or sixteen times speed and watch the read form.</p>
+        <ul class="pts">
+          <li class="rv"><span class="tick">✓</span><span><b>Exactly what you would have seen.</b> The table, the verdict and every chart are rebuilt from the saved minutes, so a replay never rewrites history.</span></li>
+          <li class="rv"><span class="tick">✓</span><span><b>Four indices, one playhead.</b> Switch between NIFTY, BANKNIFTY, SENSEX and FINNIFTY while the clock stays where you left it.</span></li>
+          <li class="rv"><span class="tick">✓</span><span><b>Good for a post-mortem.</b> Check what the Greeks were doing before a move, not after it.</span></li>
+        </ul>
+      </div>
+      <div class="phones rv">
+        <div class="phone"><img src="/greekwatch/img/m-timemachine.jpg" alt="Time Machine replaying a recorded day: the sentiment table at 12:09 with a play bar and timeline" width="645" height="1350" loading="lazy"></div>
+        <div class="phone"><img src="/greekwatch/img/m-trend.jpg" alt="Trend chart in replay: CE and PE vega difference against spot, with the playhead at 12:09" width="645" height="1350" loading="lazy"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec band" id="blast">
+    <div class="wrap">
+      <div class="center">
+        <p class="kick">Blast</p>
+        <h2 class="rv">A lab for your ideas, <em>before you trust them.</em></h2>
+        <p class="sub rv">Blast is the part of GreekWatch for people who like to test. It turns the Greeks, open interest and price into setups you can watch live, then checks them against recorded days.</p>
+      </div>
+      <div class="mini">
+        <div class="card rv"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div><span class="tag">Live</span><h3>A board for every index</h3><p>See which setups are warming up, armed or fired on NIFTY, BANKNIFTY, SENSEX and FINNIFTY, and the checks behind each one.</p></div>
+        <div class="card rv"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L4 20a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1l-6-11V3"/></svg></div><span class="tag">Lab</span><h3>Compare two versions</h3><p>Run two settings on the same days, side by side. The day files are read in your browser and never uploaded.</p></div>
+        <div class="card rv"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 5-6"/></svg></div><span class="tag">Research</span><h3>Studies with the working shown</h3><p>Long-run studies on NSE participant-wise open interest, such as who actually writes options, read against the index.</p></div>
+      </div>
+      <p class="rv" style="text-align:center;margin-top:26px;font-size:14.5px;color:var(--mute)">Blast is a study tool. It describes market conditions and places no orders.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="more">
+    <div class="wrap">
+      <div class="center"><p class="kick">And more</p><h2 class="rv">Small things that <em>make it a daily tool.</em></h2></div>
+      <div class="mini">
+        <div class="card rv"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div><h3>VIX, read two ways</h3><p>The level tells you the regime: cheap or rich premium. The change since open tells you which way it is moving.</p></div>
+        <div class="card rv"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></div><h3>Chain, with the change</h3><p>The option chain with Greeks priced from live premiums and the change since open shown for each strike, both sides.</p></div>
+        <div class="card rv"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></div><h3>Your own band</h3><p>Choose how many strikes either side of the money to include and the delta band they must sit inside. Change it in Config.</p></div>
+        <div class="card rv"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h3>Recorded every minute</h3><p>The session is saved minute by minute on the server, so a closed tab or a locked phone never leaves a gap.</p></div>
+        <div class="card rv"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></div><h3>Dark by default, light on tap</h3><p>Built for long sessions on a phone: signal colours mean the same thing on every screen, and numbers line up in columns.</p></div>
+        <div class="card rv"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z"/><path d="M8 9h8M8 13h5"/></svg></div><h3>A guide inside the app</h3><p>An in-app guide explains each screen and every formula, so you never have to guess what a number means.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="how">
+    <div class="wrap">
+      <div class="center">
+        <p class="kick">How it works</p>
+        <h2 class="rv">A morning ritual, <em>not a dashboard to browse.</em></h2>
+        <p class="sub rv">Built for the trading session: quick to start, quiet while you watch.</p>
+      </div>
+      <div class="grid3">
+        <div class="card rv"><p class="n">01</p><h3>Record the open</h3><p>One tap saves the day's opening baseline for every strike, on both sides. Everything after is measured against it.</p></div>
+        <div class="card rv"><p class="n">02</p><h3>Let it cycle</h3><p>GreekWatch refreshes on its own and keeps the full session on file, so a phone locked in your pocket loses nothing.</p></div>
+        <div class="card rv"><p class="n">03</p><h3>Read, then decide</h3><p>See the read, open the working behind it, and make your own call. GreekWatch never places an order.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec band" id="faq">
+    <div class="wrap">
+      <div class="center"><p class="kick">Questions</p><h2 class="rv">Before you open it</h2></div>
+      <div class="faq">
+        <details><summary>Is this a tip service?</summary><p>No. GreekWatch shows a reading of market data using a stated method. It does not give buy or sell recommendations and places no orders. The Capital Code is not a SEBI-registered adviser, and options carry a high risk of loss.</p></details>
+        <details><summary>Where does the data come from?</summary><p>Live option prices and open interest come from the Kotak Neo API through the app's own server. The Greeks are then priced by GreekWatch itself from those prices.</p></details>
+        <details><summary>Do I need an account?</summary><p>No. There is no login in the app. Open it and it works.</p></details>
+        <details><summary>When does it update?</summary><p>During market hours, 09:15 to 15:30 IST. Outside them you can replay recorded sessions in Time Machine.</p></details>
+        <details><summary>What does the list at the bottom do?</summary><p>It is how you hear about new features first, and how you tell us what to build next. One short email when something worth knowing ships.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="final" id="join">
+    <div class="wrap">
+      <div class="panel">
+        <p class="kick">Open now · still growing</p>
+        <h2>Use it today. <em>Shape what comes next.</em></h2>
+        <p class="sub" style="margin:0 auto">Open the app and start watching, or join the list to hear about new features first and tell us the one thing you wish it did.</p>
+        <div class="ctas" style="justify-content:center"><a class="btn" href="https://greekwatchv2.vercel.app" target="_blank" rel="noopener" style="height:54px">Open the app <span aria-hidden="true">→</span></a></div>
+        <form class="join" data-wl novalidate>
+          <input type="text" name="name" placeholder="Your name (optional)" autocomplete="name" aria-label="Your name">
+          <input type="email" name="email" placeholder="you@email.com" autocomplete="email" required aria-label="Email address">
+          <textarea name="suggestion" maxlength="600" placeholder="Your suggestion (optional): a view, a check, a chart you wish was here" aria-label="Your suggestion"></textarea>
+          <button class="btn" type="submit">Keep me posted</button>
+          <p class="msg" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>GreekWatch is an educational research tool. It is not investment advice, it places no orders, and The Capital Code is not a SEBI-registered adviser. Trading in options carries a high risk of loss. Past readings do not predict future moves.</p>
+    <p><a href="/privacy/" target="_top">Privacy Policy</a> &nbsp; <a href="/terms/" target="_top">Terms of Use</a> &nbsp; <a href="/disclaimer/" target="_top">Disclaimer</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var nav = document.getElementById('nav');
+  addEventListener('scroll', function () { nav.classList.toggle('scrolled', scrollY > 8); }, { passive: true });
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } }); }, { rootMargin: '0px 0px -6% 0px' });
+    document.querySelectorAll('.rv').forEach(function (el) { io.observe(el); });
+  } else document.querySelectorAll('.rv').forEach(function (el) { el.classList.add('in'); });
+  var f = document.querySelector('[data-wl]'), msg = f.querySelector('.msg'), btn = f.querySelector('button');
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = f.name.value.trim(), email = f.email.value.trim(), suggestion = f.suggestion.value.trim();
+    msg.className = 'msg';
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.textContent = 'Enter a valid email.'; msg.classList.add('err'); return; }
+    btn.disabled = true; msg.textContent = 'Saving…';
+    CCApi.join({ product: 'greekwatch', name: name, email: email, suggestion: suggestion }).then(function () {
+      f.classList.add('done'); msg.textContent = (name ? 'Thank you, ' + name + '. ' : 'Thank you. ') + "You're on the list, and we'll email you when something worth knowing ships.";
+    }).catch(function () { btn.disabled = false; msg.textContent = 'Something went wrong. Please try again.'; msg.classList.add('err'); });
+  });
+})();
+</script>
+</body>
+</html>

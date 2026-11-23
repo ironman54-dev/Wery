@@ -1,0 +1,43 @@
+name: Weekly Capital Code Screener Update
+
+on:
+  schedule:
+    # Friday 19:00 IST (13:30 UTC): after the NSE close and Yahoo's end-of-day update
+    - cron: '30 13 * * 5'
+    # Saturday 08:00 IST (02:30 UTC): backup run if Friday's failed
+    - cron: '30 2 * * 6'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: screener-update
+  cancel-in-progress: false
+
+jobs:
+  update-screener:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install yfinance pandas
+      - name: Run weekly screener update (3 tries, 15 min apart; stops without writing if the data looks wrong)
+        run: |
+          for i in 1 2 3; do
+            python scripts/update_screener.py && exit 0
+            echo "Attempt $i failed"
+            sleep 900
+          done
+          exit 1
+      - name: Commit updated data (latest, CSV, weekly history, status)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/data
+          git diff --cached --quiet || git commit -m "chore: weekly NSE screener update"
+          git push

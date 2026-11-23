@@ -1,0 +1,15 @@
+# secrets and local files: never commit
+.env
+.env.*
+*.env
+pixabay.env
+.vercel
+node_modules
+__pycache__/
+*.pyc
+.venv/
+_nexus_shots_src/
+.DS_Store
+
+# internal notes, never published
+_private/

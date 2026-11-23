@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CodeFlow by The Capital Code: the Indian market terminal</title>
+<meta name="description" content="Charts, breadth, backtests and options for NSE and BSE, in one terminal. Every price in rupees. Join the waitlist.">
+<meta name="theme-color" content="#ffffff">
+<meta property="og:title" content="CodeFlow by The Capital Code: the Indian market terminal">
+<meta property="og:description" content="Charts, breadth, backtests and options for NSE and BSE, in one terminal.">
+<meta property="og:image" content="/codeflow/shots/og.jpg">
+<link rel="icon" href="/codeflow/brand/tcc_symbol-small_emerald.svg">
+<link rel="preload" href="/codeflow/fonts/Fraunces-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/codeflow/css/site.css">
+<style>.tcc-strip{background:#0c120f;color:#cfd6d1;font:600 12.5px/1 system-ui,-apple-system,'Segoe UI',sans-serif;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 18px;height:38px;position:relative;z-index:50}
+.tcc-strip a{color:#cfd6d1;text-decoration:none;padding:6px 10px;border-radius:99px}.tcc-strip a:hover{color:#fff;background:rgba(255,255,255,.08)}
+.tcc-strip a.on{background:#e4e6e3;color:#101412}.tcc-strip .l{font-weight:700;letter-spacing:.02em;white-space:nowrap}
+.tcc-strip .r{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}@media(max-width:560px){.tcc-strip .l{display:none}.tcc-strip{justify-content:center}}
+.wip{display:inline-flex;align-items:center;gap:10px;margin-top:20px;padding:10px 16px;border-radius:14px;background:#fff;border:1px solid #e4e6e3;font:500 14px/1.45 system-ui,sans-serif;color:#3a423e;max-width:500px}
+.wip i{flex:none;width:9px;height:9px;border-radius:50%;background:#e0a21b;box-shadow:0 0 0 4px rgba(224,162,27,.18)}
+.wip b{color:#101412}</style>
+<script src="/js/cc-embed.js" data-site="codeflow"></script>
+<script src="/js/cc-api.js"></script>
+<style>.emb,.emb body{background:transparent!important}.emb .bgfx{display:none!important}.cfb{gap:12px}
+.cfmark svg{display:block;filter:drop-shadow(0 6px 14px rgba(16,20,18,.28))}
+.cfm-bg{fill:#151b18}.cfm-grid{stroke:rgba(255,255,255,.12);stroke-width:1;fill:none}
+.cfm-line{fill:none;stroke:#f3eedf;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:100;stroke-dashoffset:100;animation:cfdraw 2.4s .3s cubic-bezier(.6,.05,.2,1) forwards,cfbreath 7s 3s ease-in-out infinite}
+.cfm-dot{fill:#f3eedf;opacity:0;animation:cfdot .5s 2.5s forwards,cfpulse 2.4s 3s ease-in-out infinite;transform-origin:37px 19px}
+@keyframes cfdraw{to{stroke-dashoffset:0}}
+@keyframes cfdot{to{opacity:1}}
+@keyframes cfpulse{50%{transform:scale(1.45);opacity:.6}}
+@keyframes cfbreath{0%,100%{stroke-dashoffset:0}50%{stroke-dashoffset:-6}}
+.cfword{display:flex;flex-direction:column;line-height:1}
+.cfword b{font:600 27px var(--h);letter-spacing:-.025em;color:var(--ink)}
+.cfword b i{font-style:italic;font-weight:500;color:var(--mute)}
+.cfword small{font:600 9.5px var(--m);letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin-top:5px}
+html[data-theme=dark] .cfm-bg{fill:#e9eee9}html[data-theme=dark] .cfm-grid{stroke:rgba(0,0,0,.12)}
+html[data-theme=dark] .cfm-line,html[data-theme=dark] .cfm-dot{stroke:#0b0f0d;fill:#0b0f0d}html[data-theme=dark] .cfm-dot{stroke:none}
+@media (prefers-reduced-motion:reduce){.cfm-line{animation:none;stroke-dashoffset:0}.cfm-dot{animation:none;opacity:1}}
+@media (max-width:560px){.cfword small{display:none}.cfword b{font-size:23px}}
+.emb .nav .brand img{display:none}
+.sugg{width:100%;min-height:76px;border-radius:18px;border:1px solid var(--line);background:#fff;padding:14px 20px;font:500 16px var(--f);color:var(--ink);resize:vertical}
+.join .opt{flex:1 1 220px;min-width:0;height:50px;border-radius:99px;border:1px solid var(--line);background:#fff;padding:0 22px;font:500 16px var(--f);color:var(--ink)}
+.wip{display:block;max-width:520px}.wip{display:flex;align-items:flex-start}.wip i{margin-top:6px}
+html[data-theme=dark]{--bg:#0b0f0d;--band:#111714;--ink:#eef1ee;--ink2:#b8c0ba;--mute:#8a938d;--line:#232b27;--em:#dfe5df;--em2:#dfe5df;--tint:#18201c;--dark:#0b0f0d;--dark2:#18201c;--shadow:0 1px 2px rgba(0,0,0,.4),0 18px 50px -18px rgba(0,0,0,.7);color-scheme:dark}
+html[data-theme=dark] .wip,html[data-theme=dark] .sugg,html[data-theme=dark] .opt,html[data-theme=dark] .join input,html[data-theme=dark] .chip,html[data-theme=dark] details{background:#141b17;color:var(--ink);border-color:var(--line)}
+html[data-theme=dark] .wip b{color:#fff}
+html[data-theme=dark] .btn{background:#e9eee9;color:#0b0f0d;box-shadow:none}
+html[data-theme=dark] .dark{background:#141b17;color:var(--ink);border-color:var(--line)}
+html[data-theme=dark] .dark .join input{background:#0b0f0d;color:var(--ink);border-color:var(--line)}
+html[data-theme=dark] .dark .wl-msg,html[data-theme=dark] .wl-msg{color:#dfe5df}
+html[data-theme=dark] .nav{background:rgba(11,15,13,.85)}
+html[data-theme=dark] .brand img,html[data-theme=dark] .foot img,html[data-theme=dark] .stack{filter:brightness(1.9) saturate(.8)}
+html[data-theme=dark] .frame{background:#141b17;border-color:var(--line)}
+html[data-theme=dark] h1 em,html[data-theme=dark] h2 em{color:#eef3ee!important;-webkit-text-fill-color:#eef3ee!important;background-image:linear-gradient(#34453b,#34453b)!important}
+html[data-theme=dark] .dark h2,html[data-theme=dark] .dark h2 em{color:#eef1ee!important;-webkit-text-fill-color:#eef1ee!important;background-image:none!important}
+html[data-theme=dark] .dark p{color:var(--ink2)!important}
+html[data-theme=dark] .btn-lime{background:#e9eee9!important;color:#0b0f0d!important}
+html[data-theme=dark] .trust svg,html[data-theme=dark] .trust li{color:var(--ink2)}
+</style>
+</head>
+<body>
+
+<div class="bgfx" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i><span class="dots"></span></div>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand cfb" href="#top" aria-label="CodeFlow by The Capital Code">
+      <span class="cfmark" aria-hidden="true">
+        <svg viewBox="0 0 44 44" width="44" height="44"><rect width="44" height="44" rx="13" class="cfm-bg"/>
+          <path class="cfm-grid" d="M8 14h28M8 22h28M8 30h28"/>
+          <path class="cfm-line" pathLength="100" d="M7 31c4 0 4-9 8-9s4 5 8 5 4-12 8-12 3 6 6 6"/>
+          <circle class="cfm-dot" cx="37" cy="19" r="2.6"/></svg>
+      </span>
+      <span class="cfword"><b>Code<i>Flow</i></b><small>by The Capital Code</small></span>
+    </a>
+    <nav aria-label="Sections"><a href="#spot">Spot</a><a href="#working">Breadth</a><a href="#rotation">Rotation</a><a href="#screener">Screener</a><a href="#mc">Algos</a><a href="#live">Live</a><a href="#journal">Journal</a><a href="#ai">AI</a></nav>
+    <a class="btn btn-sm" href="#join">Get in line</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="copy">
+        <p class="eyebrow rv"><i></i>In the workshop · opening soon</p>
+        <h1 class="rv">The terminal that <em>shows its working.</em></h1>
+        <p class="lede rv">Every verdict has a formula you can open. Every simulation runs on your own trades. Your AI can drive it.</p>
+        <form class="join rv" data-wl novalidate>
+          <input type="email" name="email" placeholder="you@email.com" autocomplete="email" required aria-label="Email address">
+          <button class="btn" type="submit">Get in line</button>
+          <p class="wl-msg" role="status" aria-live="polite"></p>
+        </form>
+        <ul class="trust rv">
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="m5 12 5 5 9-10"/></svg>NSE and BSE only</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="m5 12 5 5 9-10"/></svg>Built on real NSE data, every price in ₹</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="m5 12 5 5 9-10"/></svg>Research, not tips</li>
+        </ul>
+        <p class="wip rv"><i></i><span><b>Still in the workshop.</b> We are building CodeFlow and testing it on real NSE data, and we will not hand over the keys until it passes our own checks, so there is no date yet. <b>Get in line now:</b> your spot is saved, you get priority access the day we open, and you can tell us the one feature you want, which goes straight onto the build list.</span></p>
+        <p class="count" data-count hidden></p>
+      </div>
+      <div class="stage rv">
+        <svg class="ring" id="ring" viewBox="-300 -300 600 600" aria-hidden="true"></svg>
+        <div class="frame hero-frame" id="heroFrame">
+          <div class="bar"><i></i><i></i><i></i><span>CodeFlow Terminal</span></div>
+          <img src="/codeflow/shots/spot.jpg" alt="CodeFlow spot chart for RELIANCE with pivot, stop and trend checks" width="2000" height="1125" fetchpriority="high">
+        </div>
+        <div class="chip c1"><b>Pivot 1,350.70</b>Setup stop 1,288.38</div>
+        <div class="chip c2"><b>Stage-2 trend: 3/7</b>Minervini 8-point audit</div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- TICKER -->
+  <div class="ticker" aria-hidden="true"><div class="track"><span>Stage-2 audit</span><span>Formula audit</span><span>Rotation radar</span><span>Indicator screener</span><span>4-phase exit</span><span>250-path Monte Carlo</span><span>5-minute spikes</span><span>R:R heatmap</span><span>Playbook study</span><span>MCP for your AI</span><span>Stage-2 audit</span><span>Formula audit</span><span>Rotation radar</span><span>Indicator screener</span><span>4-phase exit</span><span>250-path Monte Carlo</span><span>5-minute spikes</span><span>R:R heatmap</span><span>Playbook study</span><span>MCP for your AI</span></div></div>
+
+  <!-- MANIFESTO -->
+  <section class="manifesto"><div class="wrap">
+    <div class="mf rv"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M12 11v5"/></svg></span><h3>It shows its working</h3><p>Click "i" on any verdict and read the formula and the live inputs behind it.</p></div>
+    <div class="mf rv"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 18c3-8 5 2 8-6s5 2 8-6"/></svg></span><h3>It learns from your trades</h3><p>Simulations run on your own journal, not a textbook edge.</p></div>
+    <div class="mf rv"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span><h3>Your AI can drive it</h3><p>Seven tools over MCP for Claude, Cursor and any agent.</p></div>
+  </div></section>
+
+  <!-- STATS -->
+  <section class="stats"><div class="wrap">
+    <div class="stat rv"><b data-n="11">0</b><span>workspaces in one terminal</span></div>
+    <div class="stat rv"><b data-n="7">0</b><span>tools your AI can call</span></div>
+    <div class="stat rv"><b data-n="250">0</b><span>simulated paths per run</span></div>
+    <div class="stat rv"><b data-n="16">0</b><span>metrics in the screener builder</span></div>
+  </div></section>
+
+  <div class="intro wrap rv"><p class="kick">A tour of the workspaces</p><h2>One idea in <em>every workspace.</em></h2><p>Eleven tabs, and each one does something a normal terminal does not.</p></div>
+
+  <section class="x " id="spot"><div class="wrap">
+    <div class="copy">
+      <p class="num">01</p><p class="kick">Spot · quant inspector</p>
+      <h2 class="rv">Every chart gets <em>a second opinion.</em></h2>
+      <p class="rv">Beside the candles sits a panel that audits the stock: an 8-point Stage-2 trend check, a volume footprint, an earnings guardrail and a position sized to your risk.</p>
+      <ul class="pts rv"><li><span class="tick"></span><span><b>Minervini Stage-2 template,</b> scored point by point</span></li><li><span class="tick"></span><span><b>Position sized to 1R</b> before you press Buy</span></li><li><span class="tick"></span><span><b>Hide, reorder and resize</b> every card</span></li></ul>
+    </div>
+    <figure class="fwrap rv"><div class="frame"><div class="bar"><i></i><i></i><i></i><span>Spot</span></div><img src="/codeflow/shots/g-spot.jpg" alt="Spot chart with the quant inspector on the right" loading="lazy" width="2000" height="1250"></div><div class="zoom z-left"><img src="/codeflow/shots/g-inspector.jpg" alt="The quant inspector: setup and risk matrix, position sizer, earnings guardrail and the 8-point Stage-2 audit" width="560" height="1038" loading="lazy"></div><figcaption class="real">Real capture from the running app</figcaption></figure>
+  </div></section>
+  <section class="x rev band" id="working"><div class="wrap">
+    <div class="copy">
+      <p class="num">02</p><p class="kick">Breadth · open the math</p>
+      <h2 class="rv">Every verdict <em>shows its working.</em></h2>
+      <p class="rv">The market regime and the follow-through-day tracker are not black boxes. Tap "i" and read the exact rule, with today's live inputs beside it.</p>
+      <ul class="pts rv"><li><span class="tick"></span><span><b>Regime verdict</b> scored from live inputs</span></li><li><span class="tick"></span><span><b>O'Neil follow-through day</b> tracked step by step</span></li><li><span class="tick"></span><span><b>Computed from daily bars</b> of the stocks it tracks</span></li></ul>
+    </div>
+    <figure class="fwrap rv"><div class="frame"><div class="bar"><i></i><i></i><i></i><span>Breadth</span></div><img src="/codeflow/shots/f-audit.jpg" alt="Market regime card with its methodology and live calculation proof open" loading="lazy" width="2000" height="535"></div><figcaption class="real">Real capture from the running app</figcaption></figure>
+  </div></section>
+  <section class="x " id="rotation"><div class="wrap">
+    <div class="copy">
+      <p class="num">03</p><p class="kick">Rotation radar</p>
+      <h2 class="rv">Watch money <em>rotate between sectors.</em></h2>
+      <p class="rv">A relative rotation graph with comet tails shows where each sector came from, not just where it sits. Press play and watch the rotation unfold.</p>
+      <ul class="pts rv"><li><span class="tick"></span><span><b>Sectors, industries, indices</b> or single stocks</span></li><li><span class="tick"></span><span><b>Tails, quadrants</b> and a replay slider</span></li><li><span class="tick"></span><span><b>Click a node</b> to drill into its stocks</span></li></ul>
+    </div>
+    <figure class="fwrap rv"><div class="frame"><div class="bar"><i></i><i></i><i></i><span>Rotation</span></div><img src="/codeflow/shots/g-rrg.jpg" alt="Relative rotation graph with comet tails and the rotational velocity matrix" loading="lazy" width="2000" height="938"></div><figcaption class="real">Real capture from the running app</figcaption></figure>
+  </div></section>
+  <section class="x rev band" id="screener"><div class="wrap">
+    <div class="copy">
+      <p class="num">04</p><p class="kick">Screener builder</p>
+      <h2 class="rv">Screens that can <em>screen indicators.</em></h2>
+      <p class="rv">Compare an indicator with another indicator: RSI against its own EMA, Supertrend on RSI, EMA on volume. Save the rule sets, or paste a formula.</p>
+      <ul class="pts rv"><li><span class="tick"></span><span><b>16 metrics</b> with AND or OR logic</span></li><li><span class="tick"></span><span><b>Study-on-study metrics</b> inside your rules</span></li><li><span class="tick"></span><span><b>Saved screeners</b> and a quick formula parser</span></li></ul>
+    </div>
+    <figure class="fwrap rv"><div class="frame"><div class="bar"><i></i><i></i><i></i><span>Screener</span></div><img src="/codeflow/shots/g-builder.jpg" alt="Custom screener builder with indicator-on-indicator rules" loading="lazy" width="2000" height="1125"></div><figcaption class="real">Real capture from the running app</figcaption></figure>
+  </div></section>
+  <section class="x stack" id="exit"><div class="wrap">
+    <div class="copy">
+      <p class="num">05</p><p class="kick">Systems · 4-phase exit engine</p>
+      <h2 class="rv">A stop that <em>climbs with the trade.</em></h2>
+      <p class="rv">Most backtests use one fixed stop. CodeFlow's exit is a state machine: it holds early, then ratchets the stop up as the trade proves itself.</p>
+      <ul class="pts rv"><li><span class="tick"></span><span><b>Hard stop</b> first, then breakeven plus 0.15R at +1.2R</span></li><li><span class="tick"></span><span><b>Floor and trail:</b> lock +1R, then trail with an ATR chandelier</span></li><li><span class="tick"></span><span><b>Every rule written out</b> before you run the test</span></li></ul>
+    </div>
+    <figure class="fwrap rv"><div class="frame"><div class="bar"><i></i><i></i><i></i><span>Systems</span></div><img src="/codeflow/shots/f-exit.jpg" alt="Strategy rules architecture with the 4-phase exit state machine" loading="lazy" width="2000" height="245"></div><figcaption class="real">Real capture from the running app</figcaption></figure>
+  </div></section>
+  <section class="x band" id="ai-architect"><div class="wrap">
+    <div class="copy">
+      <p class="num">06</p><p class="kick">AI strategy architect</p>
+      <h2 class="rv">Describe it. <em>Get a testable system.</em></h2>
+      <p class="rv">Write a strategy in plain English. CodeFlow compiles it into a step-by-step flow with entry, stop and exit phases, then loads it into the backtester.</p>
+      <ul class="pts rv"><li><span class="tick"></span><span><b>Readable steps,</b> not a black box</span></li><li><span class="tick"></span><span><b>Same 4-phase exit</b> engine underneath</span></li><li><span class="tick"></span><span><b>One click</b> to open it in Systems</span></li></ul>
+    </div>
+    <figure class="fwrap rv"><div class="frame"><div class="bar"><i></i><i></i><i></i><span>AI Chat</span></div><img src="/codeflow/shots/g-ai.jpg" alt="AI strategy architect compiling a plain-English VCP strategy into a modular flow" loading="lazy" width="2000" height="812"></div><figcaption class="real">Real capture from the running app</figcaption></figure>
+  </div></section>
+  <section class="x stack" id="mc"><div class="wrap">
+    <div class="copy">
+      <p class="num">07</p><p class="kick">Algos · your edge, simulated</p>
+      <h2 class="rv">250 futures, <em>from your own trades.</em></h2>
+      <p class="rv">Run 250 random trade sequences from your win rate and R-multiples, or load your realised journal. See the equity paths, the worst losing streak and Half-Kelly sizing.</p>
+      <ul class="pts rv"><li><span class="tick"></span><span><b>Load your journal</b> to calibrate it on your real edge</span></li><li><span class="tick"></span><span><b>Risk of ruin</b> and 95th percentile loss streak</span></li><li><span class="tick"></span><span><b>Full and Half-Kelly</b> to stop over-leveraging</span></li></ul>
+    </div>
+    <figure class="fwrap rv"><div class="frame"><div class="bar"><i></i><i></i><i></i><span>Algos</span></div><img src="/codeflow/shots/f-mc.jpg" alt="250 simulated equity paths" loading="lazy" width="1700" height="490"></div><figcaption class="real">Real capture from the running app</figcaption></figure>
+  </div></section>
+  <section class="x rev band" id="live"><div class="wrap">
+    <div class="copy">
+      <p class="num">08</p><p class="kick">Live desk</p>
+      <h2 class="rv">Spikes and concentration, <em>before you look.</em></h2>
+      <p class="rv">A 5-minute feed flags sudden surges and flushes across your watchlist. A sector donut warns when one sector passes 35% of your capital.</p>
+      <ul class="pts rv"><li><span class="tick"></span><span><b>2% to 5% thresholds</b> on 5-minute bars</span></li><li><span class="tick"></span><span><b>Sparklines</b> and one-click chart inspect</span></li><li><span class="tick"></span><span><b>Concentration alerts</b> and portfolio heat</span></li></ul>
+    </div>
+    <figure class="fwrap rv"><div class="frame"><div class="bar"><i></i><i></i><i></i><span>Live</span></div><img src="/codeflow/shots/g-live.jpg" alt="Five-minute high-volatility alert feed" loading="lazy" width="2000" height="891"></div><div class="zoom z-wide"><img src="/codeflow/shots/g-donut.jpg" alt="Sector concentration donut with a high-concentration warning" width="1100" height="472" loading="lazy"></div><figcaption class="real">Real capture from the running app</figcaption></figure>
+  </div></section>
+  <section class="x stack" id="journal"><div class="wrap">
+    <div class="copy">
+      <p class="num">09</p><p class="kick">Journal</p>
+      <h2 class="rv">See which setups <em>actually pay.</em></h2>
+      <p class="rv">A heatmap crosses every setup with its R-multiple outcomes, then writes the verdict: where your right-tail winners come from and which setup to size down.</p>
+      <ul class="pts rv"><li><span class="tick"></span><span><b>Setup by R-multiple</b> matrix</span></li><li><span class="tick"></span><span><b>Expectancy, profit factor</b> and +2R share per setup</span></li><li><span class="tick"></span><span><b>Calendar coloured</b> by average R</span></li></ul>
+    </div>
+    <figure class="fwrap rv"><div class="frame"><div class="bar"><i></i><i></i><i></i><span>Journal</span></div><img src="/codeflow/shots/g-journal.jpg" alt="Risk to reward heatmap matrix by setup" loading="lazy" width="2000" height="750"></div><figcaption class="real">Real capture · sample journal trades</figcaption></figure>
+  </div></section>
+  <section class="x band" id="study"><div class="wrap">
+    <div class="copy">
+      <p class="num">10</p><p class="kick">Study</p>
+      <h2 class="rv">Learn a setup <em>before you trade it.</em></h2>
+      <p class="rv">Curated playbooks on real NSE charts, such as TRENT's volatility contraction and HAL's high tight flag. Each one has an entry checklist, invalidation rules and a replay drill.</p>
+      <ul class="pts rv"><li><span class="tick"></span><span><b>Entry checklist</b> and invalidation criteria</span></li><li><span class="tick"></span><span><b>Replay drill</b> with a Buy button and a score</span></li><li><span class="tick"></span><span><b>Blind mode</b> hides the answer</span></li></ul>
+    </div>
+    <figure class="fwrap rv"><div class="frame"><div class="bar"><i></i><i></i><i></i><span>Study</span></div><img src="/codeflow/shots/g-study.jpg" alt="Study playbook for a TRENT volatility contraction breakout with entry checklist" loading="lazy" width="2000" height="922"></div><figcaption class="real">Real capture from the running app</figcaption></figure>
+  </div></section>
+  <section class="x rev" id="ai"><div class="wrap">
+    <div class="copy">
+      <p class="num">11</p><p class="kick">Built for your AI</p>
+      <h2 class="rv">Let your AI <em>drive the terminal.</em></h2>
+      <p class="rv">CodeFlow runs an MCP server. Claude Desktop, Cursor, Windsurf or your own agent can scan patterns, read breadth, run a backtest or a Monte Carlo on the same engines you use.</p>
+      <ul class="pts rv"><li><span class="tick"></span><span><b>Seven tools</b> over JSON-RPC 2.0</span></li><li><span class="tick"></span><span><b>Plain-English strategies</b> compiled and backtested by the AI architect</span></li><li><span class="tick"></span><span><b>Orders are paper only</b> through the tool</span></li></ul>
+    </div>
+    <figure class="fwrap rv"><div class="frame"><div class="bar"><i></i><i></i><i></i><span>MCP server</span></div><img src="/codeflow/shots/f-mcp.jpg" alt="The MCP playground calling the pattern scan tool and showing the live response" loading="lazy" width="2000" height="1460"></div><figcaption class="real">Real capture from the running app</figcaption></figure>
+  </div></section>
+
+  <!-- SMALL CARDS -->
+  <section class="f more" id="more">
+    <div class="wrap">
+      <div class="copy center">
+        <p class="kick">And plenty more</p>
+        <h2 class="rv">The details <em>traders notice.</em></h2>
+      </div>
+      <div class="grid6">
+        <div class="mini rv"><b>Replay gym</b><span>Step through a chart bar by bar, with the Space bar.</span></div>
+        <div class="mini rv"><b>Study on study</b><span>+EMA, +SMA, +Supertrend or +BB on RSI, MACD, ATR and Stoch RSI.</span></div>
+        <div class="mini rv"><b>Drawing in oscillators</b><span>Trendlines and channels inside any indicator pane.</span></div>
+        <div class="mini rv"><b>On-chart R:R sizer</b><span>Drag target, entry and stop handles straight on the chart.</span></div>
+        <div class="mini rv"><b>Multi-leg options lab</b><span>NIFTY and BANKNIFTY legs with Greeks, max pain and PCR.</span></div>
+        <div class="mini rv"><b>TradingView switch</b><span>Flip between the quant chart and TradingView Pro.</span></div>
+        <div class="mini rv"><b>Three themes</b><span>Daylight, graphite and OLED black.</span></div>
+        <div class="mini rv"><b>Quick jump</b><span>Ctrl or Cmd + K to open any symbol.</span></div>
+        <div class="mini rv"><b>Audio thesis memos</b><span>Record why you took the trade, on the trade.</span></div>
+        <div class="mini rv"><b>Earnings guardrail</b><span>Position-size rules for results dates, in tiers.</span></div>
+        <div class="mini rv"><b>Resizable cockpit</b><span>Show, hide, reorder and resize panels. It remembers.</span></div>
+        <div class="mini rv"><b>FII / DII and block deals</b><span>A flow and deal tape. Sample data until a feed is connected.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FROM THE CAPITAL CODE (banner) -->
+  <section class="tcc">
+    <div class="wrap">
+      <div class="banner rv">
+        <img src="/codeflow/brand/banner.jpg" alt="The Capital Code. Know the system. Live the code." width="1920" height="1080" loading="lazy">
+      </div>
+      <p class="rv from">CodeFlow is built by <b>The Capital Code</b>, a channel that shows India's money system with real data. No tips. No calls.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="f band" id="faq">
+    <div class="wrap narrow">
+      <div class="copy center"><p class="kick">Questions</p><h2 class="rv">Before you join</h2></div>
+      <details class="rv"><summary>Is this investment advice?</summary><p>No. CodeFlow is a research and learning tool. It does not tell you what to buy or sell, and The Capital Code is not a SEBI-registered adviser.</p></details>
+      <details class="rv"><summary>What does "shows its working" mean?</summary><p>Verdicts such as the market regime and the follow-through day come with an "i" button. It opens the exact rule and the live numbers that produced the answer, so you can check it yourself.</p></details>
+      <details class="rv"><summary>Can my AI assistant use it?</summary><p>Yes. CodeFlow includes an MCP server with seven tools, including pattern scans, breadth, backtests and Monte Carlo. Orders through the tool are paper trades only.</p></details>
+      <details class="rv"><summary>Which markets does it cover?</summary><p>NSE and BSE cash stocks, sector indices, and NIFTY and BANKNIFTY options. Everything is in rupees.</p></details>
+      <details class="rv"><summary>When do I get in?</summary><p>CodeFlow is still in production and testing, so there is no date yet. When it is ready we open the doors in small batches, in the order people join, and email you when yours is ready.</p></details>
+      <details class="rv"><summary>Are these real screens?</summary><p>The two screenshots are captures of the running app from 20 November 2026, in the Daylight theme. The animated panels are illustrations of how each feature works, with synthetic data.</p></details>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final" id="join">
+    <div class="wrap">
+      <div class="dark">
+        <svg class="ring ring2" aria-hidden="true" viewBox="-300 -300 600 600"></svg>
+        <img class="stack" src="/codeflow/brand/tcc_lockup-stacked_emerald.svg" alt="The Capital Code. Know the system. Live the code." width="260" height="190">
+        <h2>Still in the workshop. <em>Be first through the door.</em></h2>
+        <p>CodeFlow is in production and in testing. Get in line today and you get priority access when we open, plus a say in what we build next: tell us the one thing you want from a market terminal.</p>
+        <form class="join" data-wl novalidate>
+          <input class="opt" type="text" name="name" placeholder="Your name (optional)" autocomplete="name" aria-label="Your name">
+          <input type="email" name="email" placeholder="you@email.com" autocomplete="email" required aria-label="Email address">
+          <textarea class="sugg" name="suggestion" maxlength="600" placeholder="Your suggestion (optional): a chart, a scan, an indicator, anything you wish your terminal did" aria-label="Your suggestion"></textarea>
+          <button class="btn btn-lime" type="submit">Get in line</button>
+          <p class="wl-msg" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <img src="/codeflow/brand/tcc_lockup-horizontal_emerald.svg" alt="The Capital Code" width="200" height="64">
+    <p class="legal">CodeFlow is an educational research tool. It is not investment advice, and The Capital Code is not a SEBI-registered adviser. Past results do not predict future results.</p>
+  </div>
+</footer>
+
+<script src="/codeflow/js/main.js"></script>
+</body>
+</html>
