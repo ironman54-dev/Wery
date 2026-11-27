@@ -1,17 +1,17 @@
 {
-  "updated_utc": "2026-11-23T23:33:34.846241+00:00",
+  "updated_utc": "2026-11-27T23:13:52.457088+00:00",
   "issues": [],
   "ok": true,
-  "updated_at_ist": "24 Nov 2026, 05:02 AM IST",
-  "market_date": "2026-11-20",
+  "updated_at_ist": "28 Nov 2026, 04:42 AM IST",
+  "market_date": "2026-11-27",
   "universe": 959,
-  "scanned": 914,
-  "qualifying": 124,
+  "scanned": 916,
+  "qualifying": 127,
   "data_source": "store",
   "freshness_note": "",
   "held_out_for_review": {},
   "yahoo_crosscheck": {
-    "checked": 959,
+    "checked": 958,
     "differ": []
   }
 }
