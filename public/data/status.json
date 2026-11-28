@@ -1,8 +1,10 @@
 {
-  "updated_utc": "2026-11-27T23:13:52.457088+00:00",
-  "issues": [],
+  "updated_utc": "2026-11-28T12:14:10.094372+00:00",
+  "issues": [
+    "2 latest close(s) differ from Yahoo's: INTERARCH, TECHM. The NSE value is shown."
+  ],
   "ok": true,
-  "updated_at_ist": "28 Nov 2026, 04:42 AM IST",
+  "updated_at_ist": "28 Nov 2026, 05:43 PM IST",
   "market_date": "2026-11-27",
   "universe": 959,
   "scanned": 916,
@@ -11,7 +13,20 @@
   "freshness_note": "",
   "held_out_for_review": {},
   "yahoo_crosscheck": {
-    "checked": 958,
-    "differ": []
+    "checked": 959,
+    "differ": [
+      [
+        "INTERARCH",
+        "2026-11-27",
+        1526.5,
+        305.3
+      ],
+      [
+        "TECHM",
+        "2026-11-27",
+        1813.9,
+        906.95
+      ]
+    ]
   }
 }
